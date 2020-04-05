@@ -51,6 +51,7 @@ public final class ThingLogger  {
         return allArgs;
     }
 
+    // FIXME: Passing a msg containing a {} does NOT work - variables are not substituted. Fix this mess.
     public void logDebug(String msg, Object... args) {
         if (logger.isDebugEnabled()) {
             logger.debug("{}[{}]: {}", prependUID(msg, args == null ? new Object[0] : args));
