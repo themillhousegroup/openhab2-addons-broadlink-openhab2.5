@@ -67,6 +67,10 @@ public class BroadlinkHandlerFactory extends BaseThingHandlerFactory {
             if (logger.isDebugEnabled()) logger.debug("RM 3 handler requested created");
             return new BroadlinkRemoteHandler(thing);
         }
+        if (thingTypeUID.equals(BroadlinkBindingConstants.THING_TYPE_RM4)) {
+            if (logger.isDebugEnabled()) logger.debug("RM 4 handler requested created");
+            return new BroadlinkRemoteModel4Handler(thing);
+        }
         if (thingTypeUID.equals(BroadlinkBindingConstants.THING_TYPE_A1)) {
             if (logger.isDebugEnabled()) logger.debug("A1 handler requested created");
             return new BroadlinkA1Handler(thing);

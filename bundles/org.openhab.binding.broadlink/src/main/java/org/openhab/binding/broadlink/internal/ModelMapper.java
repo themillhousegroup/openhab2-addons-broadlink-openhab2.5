@@ -61,13 +61,15 @@ public class ModelMapper {
         if (model == 0x27c2)
             return BroadlinkBindingConstants.THING_TYPE_RM3; // RM Mini 3, firmware rev v40
         if (model == 0x5f36) 
-            return BroadlinkBindingConstants.THING_TYPE_RM3; // RM Mini 3, firmware v44057
+            return BroadlinkBindingConstants.THING_TYPE_RM3; // RM Mini 3, firmware v44057 - treated as an RM4 due to sendCode quirk
         if (model == 0x51da)
-            return BroadlinkBindingConstants.THING_TYPE_RM3; // RM4b
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4b
         if (model == 0x610f || model == 0x62be)
-            return BroadlinkBindingConstants.THING_TYPE_RM3; // RM4c
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4c
         if (model == 0x610e)
-            return BroadlinkBindingConstants.THING_TYPE_RM3; // RM4 Mini
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Mini
+        if (model == 0x61a2)
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Pro
         if (model == 0x273d)
             return BroadlinkBindingConstants.THING_TYPE_RM; // RM Pro Phicomm
         if (model == 0x2783)
