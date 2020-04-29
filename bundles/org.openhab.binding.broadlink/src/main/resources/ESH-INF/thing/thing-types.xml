@@ -590,7 +590,7 @@
 	</thing-type>
 	<thing-type id="rm2">
 	<label>Broadlink RM2</label>
-	<description>The Broadlink RM Pro is a IR\RF transmitter and temperature sensor with Wi-Fi connectivity.</description>
+	<description>The Broadlink RM 2/Pro is an IR\RF transmitter and temperature sensor with Wi-Fi connectivity.</description>
 	<channels>
 		<channel id="command" typeId="command" />
 		<channel id="temperature" typeId="temperature" />
@@ -668,7 +668,7 @@
 	</thing-type>
 	<thing-type id="rm3">
 	<label>Broadlink RM3</label>
-	<description>The Broadlink RM Mini is a IR transmitter with Wi-Fi connectivity.</description>
+	<description>The Broadlink RM 3/Mini is an IR transmitter with Wi-Fi connectivity.</description>
 	<channels>
 		<channel id="command" typeId="command" />
 	</channels>
@@ -749,6 +749,90 @@
 		<default>10026</default>
 		</parameter>
 	</config-description>
+	</thing-type>
+	<thing-type id="rm4">
+		<label>Broadlink RM4</label>
+		<description>The Broadlink RM 4 is an IR transmitter with Wi-Fi connectivity.</description>
+		<channels>
+			<channel id="command" typeId="command" />
+		</channels>
+		<config-description>
+			<parameter name="ipAddress" type="text">
+				<context>network-address</context>
+				<label>Network Address</label>
+				<description>Network address of the device.</description>
+				<required>true</required>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="staticIp" type="boolean">
+				<context>static-ip</context>
+				<label>Static IP</label>
+				<description>Will the device always be given this network address?</description>
+				<required>true</required>
+				<advanced>true</advanced>
+				<default>true</default>
+			</parameter>
+			<parameter name="port" type="integer">
+				<context>network-port</context>
+				<label>Network Port</label>
+				<description>Network port of the device.</description>
+				<required>true</required>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="mac" type="text">
+				<context>mac-address</context>
+				<label>MAC Address</label>
+				<description>MAC address of the device.</description>
+				<required>true</required>
+				<advanced>true</advanced>
+			</parameter>
+			<parameter name="pollingInterval" type="integer" min="30" step="1">
+				<label>Polling Interval</label>
+				<description>The interval in seconds for polling the status of the device.</description>
+				<required>true</required>
+				<default>30</default>
+			</parameter>
+			<parameter name="mapFilename" type="text">
+				<label>Map File</label>
+				<description>Enter name of file containing mapping of commands to IR codes</description>
+				<required>true</required>
+				<default>broadlink.map</default>
+			</parameter>
+			<parameter name="authorizationKey" type="text">
+				<context>password</context>
+				<label>Authentication Key</label>
+				<description>Authentication key of the device.</description>
+				<required>true</required>
+			</parameter>
+			<parameter name="iv" type="text">
+				<context>password</context>
+				<label>IV</label>
+				<description>Initialization Vector</description>
+				<required>true</required>
+			</parameter>
+			<parameter name="retries" type="integer" min="0" max="1">
+				<label>Retries</label>
+				<description>The number of times to retry a network request before declaring the device Offline</description>
+				<required>true</required>
+				<advanced>true</advanced>
+				<default>1</default>
+			</parameter>
+			<parameter name="ignoreFailedUpdates" type="boolean">
+				<context>ignore-failed-updates</context>
+				<label>Ignore Failed Updates</label>
+				<description>Should failed status requests force the device offline?</description>
+				<required>true</required>
+				<advanced>true</advanced>
+				<default>false</default>
+			</parameter>
+			<parameter name="deviceType" type="integer">
+				<label>Device Type</label>
+				<description>The internal device type, see: https://github.com/mjg59/python-broadlink/blob/5daf12c86f8c046adcfde6151fcd4747eb4f882b/broadlink/__init__.py#L18 - enter as Integer! i.e. 0x272a = 10026</description>
+				<required>true</required>
+				<advanced>true</advanced>
+				<default>24846</default>
+			</parameter>
+		</config-description>
 	</thing-type>
 
 	<!-- Sample Channel Type -->
