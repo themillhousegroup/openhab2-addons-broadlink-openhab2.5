@@ -71,8 +71,7 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
 
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (!Utils.isOnline(getThing())) {
-            thingLogger.logDebug("Can't handle command {} because handler for thing {} is not ONLINE", command,
-                    getThing().getLabel());
+            thingLogger.logDebug("Can't handle command " + command +" because handler for thing " + getThing().getLabel() + " is not ONLINE");
             return;
         }
         if (command instanceof RefreshType) {
@@ -81,12 +80,12 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
         }
         Channel channel = thing.getChannel(channelUID.getId());
         if (channel == null) {
-            thingLogger.logError("Unexpected null channel while handling command {}", command.toFullString());
+            thingLogger.logError("Unexpected null channel while handling command " + command.toFullString());
             return;
         }
         ChannelTypeUID channelTypeUID = channel.getChannelTypeUID();
         if (channelTypeUID == null) {
-            thingLogger.logError("Unexpected null channelTypeUID while handling command {}", command.toFullString());
+            thingLogger.logError("Unexpected null channelTypeUID while handling command " + command.toFullString());
             return;
         }
         String s;
@@ -104,8 +103,7 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
                 // fall through
 
             default:
-                thingLogger.logDebug("Thing {} has unknown channel type {}", getThing().getLabel(),
-                        channelTypeUID.getId());
+                thingLogger.logDebug("Thing " + getThing().getLabel() + " has unknown channel type " + channelTypeUID.getId());
                 break;
             }
         } catch (IOException e) {
@@ -120,14 +118,13 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
         }
         String mapFile = (String) thing.getConfiguration().get("mapFilename");
         if (StringUtils.isEmpty(mapFile)) {
-            thingLogger.logDebug("MAP file is not defined in configuration of thing {}", getThing().getLabel());
+            thingLogger.logDebug("MAP file is not defined in configuration of thing " + getThing().getLabel());
             return null;
         }
         BundleContext bundleContext = FrameworkUtil.getBundle(BroadlinkRemoteHandler.class).getBundleContext();
         TransformationService transformService = TransformationHelper.getTransformationService(bundleContext, "MAP");
         if (transformService == null) {
-            thingLogger.logError("Failed to get MAP transformation service for thing {}; is bundle installed?",
-                    getThing().getLabel());
+            thingLogger.logError("Failed to get MAP transformation service for thing " + getThing().getLabel() +"; is bundle installed?");
             return null;
         }
         byte code[] = null;

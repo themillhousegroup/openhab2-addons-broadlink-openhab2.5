@@ -50,7 +50,7 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
             updateState("temperature", new DecimalType(temperature));
             return true;
         } catch (Exception e) {
-            thingLogger.logError("Could not get status: {}", e);
+            thingLogger.logError("Could not get status: " + e.getMessage());
             return false;
         }
     }

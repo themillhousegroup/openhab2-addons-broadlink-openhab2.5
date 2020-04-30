@@ -151,7 +151,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             authenticated = true;
             return true;
         } catch (Exception e) {
-            thingLogger.logError("Authentication failed: {}", e);
+            thingLogger.logError("Authentication failed: " + e.getMessage());
             return false;
         }
 
@@ -183,7 +183,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             thingLogger.logTrace("key is full; get from properties" + Arrays.toString(key));
         }
         count = count + 1 & 0xffff;
-        thingLogger.logTrace("building message with count: {}, id: {}, key: {}", count, Hex.toHexString(id), Hex.toHexString(key));
+        thingLogger.logTrace("building message with count: " + count + ", id: " + Hex.toHexString(id) + ", key: " +Hex.toHexString(key));
         return BroadlinkProtocol.buildMessage(
                 command,
                 payload,

@@ -48,7 +48,7 @@ public class RetryableSocket {
         }
 
         if (thingConfig.getRetries() > 0) {
-            thingLogger.logTrace("Retrying sendAndReceive ONE time before giving up...");
+            thingLogger.logTrace("Retrying sendAndReceive (for " + purpose + ") ONE time before giving up...");
             return sendAndReceiveOneTime(message, purpose);
         }
 
@@ -56,8 +56,15 @@ public class RetryableSocket {
     }
 
     private byte @Nullable [] sendAndReceiveOneTime(byte message[], String purpose) {
+        // To avoid the possibility of a very fast response not being heard,
+        // we set up as much as possible for the response ahead of time:
+        byte response[] = new byte[1024];
+        DatagramPacket receivePacket = new DatagramPacket(response, response.length);
         if (sendDatagram(message, purpose)) {
-            return receiveDatagram(purpose);
+            receivePacket = receiveDatagram(purpose, receivePacket);
+            if (receivePacket != null) {
+                return receivePacket.getData();
+            }
         }
 
         return null;
@@ -80,30 +87,26 @@ public class RetryableSocket {
             thingLogger.logTrace("Sending " + purpose + " complete");
             return true;
         } catch (IOException e) {
-            thingLogger.logError("IO error during UDP command sending: {}", e.getMessage());
+            thingLogger.logError("IO error during UDP command sending " + purpose + " +: " + e.getMessage());
             return false;
         }
     }
 
-    private byte @Nullable [] receiveDatagram(String purpose) {
-        thingLogger.logTrace("Receiving " + purpose);
+    private @Nullable DatagramPacket receiveDatagram(String purpose, DatagramPacket receivePacket) {
+        thingLogger.logTrace("Awaiting " + purpose + " response");
 
         try {
             if (socket == null) {
                 thingLogger.logError("receiveDatagram " + purpose + " for socket was unexpectedly null");
             } else {
-                byte response[] = new byte[1024];
-                DatagramPacket receivePacket = new DatagramPacket(response, response.length);
                 socket.receive(receivePacket);
-                response = receivePacket.getData();
                 thingLogger.logTrace("Received " + purpose + " (" + receivePacket.getLength() + " bytes)");
-
-                return response;
+                return receivePacket;
             }
         } catch (SocketTimeoutException ste) {
             thingLogger.logDebug("No further " + purpose + " response received for device");
         } catch (Exception e) {
-            thingLogger.logError("While {} - IO Exception: '{}'", purpose, e.getMessage());
+            thingLogger.logError("While " + purpose + " - IO Exception: '" + e.getMessage() + "'");
         }
 
         return null;
