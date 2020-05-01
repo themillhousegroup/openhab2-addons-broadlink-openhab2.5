@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
  */
 @NonNullByDefault
 public class Hex {
-    private static final Pattern validPattern = Pattern.compile("0000( +[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])+");
     private static final String HEXES = "0123456789ABCDEF";
 
     public static String decodeMAC(byte mac[]) throws IOException {
@@ -48,10 +47,7 @@ public class Hex {
         return sb.toString();
     }
 
-    public static boolean isHexCode(String code) {
-        return validPattern.matcher(code).find();
-    }
-
+    // FIXME: Why do both of these exist?
     public static byte[] convertHexToBytes(String code) {
         return DatatypeConverter.parseHexBinary(code);
     }
@@ -70,10 +66,7 @@ public class Hex {
         return result;
     }
 
-    public static String toHexString(byte raw[]) throws IOException {
-        if (raw == null) {
-            throw new IOException("Cannot convert a null byte array to a hex string");
-        }
+    public static String toHexString(byte raw[]) {
         StringBuilder hex = new StringBuilder(2 * raw.length);
         byte abyte0[];
         int j = (abyte0 = raw).length;

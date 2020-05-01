@@ -37,4 +37,37 @@ public class HexTest {
         byte[] mac = new byte[] { (byte) 0xff, (byte) 0xee, (byte) 0xdd, (byte) 0xcc, (byte) 0xbb};
         Hex.decodeMAC(mac);
     }
+
+    @Test
+    public void convertHexToBytes() throws IOException {
+        byte[] mac = new byte[] { (byte) 0xff, (byte) 0xee, (byte) 0xdd, (byte) 0xcc, (byte) 0xbb, (byte) 0xaa};
+        String s = "ffeeddccbbaa";
+        byte[] result = Hex.convertHexToBytes(s);
+        assertEquals(mac[0], result[0]);
+        assertEquals(mac[1], result[1]);
+        assertEquals(mac[2], result[2]);
+        assertEquals(mac[3], result[3]);
+        assertEquals(mac[4], result[4]);
+        assertEquals(mac[5], result[5]);
+    }
+
+    @Test
+    public void fromHexString() throws IOException {
+        byte[] mac = new byte[] { (byte) 0xff, (byte) 0xee, (byte) 0xdd, (byte) 0xcc, (byte) 0xbb, (byte) 0xaa};
+        String s = "ffeeddccbbaa";
+        byte[] result = Hex.fromHexString(s);
+        assertEquals(mac[0], result[0]);
+        assertEquals(mac[1], result[1]);
+        assertEquals(mac[2], result[2]);
+        assertEquals(mac[3], result[3]);
+        assertEquals(mac[4], result[4]);
+        assertEquals(mac[5], result[5]);
+    }
+
+    @Test
+    public void toHexString() throws IOException {
+        byte[] mac = new byte[] { (byte) 0xff, (byte) 0xee, (byte) 0xdd, (byte) 0xcc, (byte) 0xbb, (byte) 0xaa};
+        String result = Hex.toHexString(mac);
+        assertEquals("FFEEDDCCBBAA", result);
+    }
 }
