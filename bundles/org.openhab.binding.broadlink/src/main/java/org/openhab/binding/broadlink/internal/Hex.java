@@ -30,8 +30,8 @@ public class Hex {
     private static final String HEXES = "0123456789ABCDEF";
 
     public static String decodeMAC(byte mac[]) throws IOException {
-        if (mac == null) {
-            throw new IOException("No MAC provided, cannot decode it");
+        if (mac.length < 6) {
+            throw new IOException("Insufficient MAC bytes provided, cannot decode it");
         }
 
         StringBuilder sb = new StringBuilder(18);
