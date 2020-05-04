@@ -181,16 +181,12 @@ public class BroadlinkProtocol {
         return packet;
     }
 
-    public static byte[] decodePacket(byte[] packet, @Nullable BroadlinkDeviceConfiguration thingConfig,
-            @Nullable Map<String, String> properties) throws IOException {
+    public static byte[] decodePacket(byte[] packet, BroadlinkDeviceConfiguration thingConfig,
+            Map<String, String> properties) throws IOException {
         // if a properties map is supplied, use it.
         // During initial thing startup we don't have one yet, so use the auth key from
         // the config.
-        final String key = (properties == null) ? thingConfig.getAuthorizationKey() : properties.get("key");
-
-        if (packet == null) {
-            throw new ProtocolException("Incoming packet from device is null.");
-        }
+        final String key = PropertyUtils.hasProperty(properties, "key") ? properties.get("key") : thingConfig.getAuthorizationKey();
 
         boolean error = (int) packet[0x22] != 0 || (int) packet[0x23] != 0;// || (int) packet[0x24] != 0;
         if (error) {

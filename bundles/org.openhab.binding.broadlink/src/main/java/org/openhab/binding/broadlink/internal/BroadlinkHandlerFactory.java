@@ -16,16 +16,13 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.openhab.binding.broadlink.BroadlinkBindingConstants;
 import org.openhab.binding.broadlink.handler.*;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.framework.ServiceRegistration;
-import java.util.*;
-//import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,15 +37,6 @@ import org.slf4j.LoggerFactory;
 public class BroadlinkHandlerFactory extends BaseThingHandlerFactory {
 
     private final Logger logger = LoggerFactory.getLogger(BroadlinkHandlerFactory.class);
-    private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs;
-//    private List channelTypes;
-//    private List channelGroupTypes;
-
-    public BroadlinkHandlerFactory() {
-        discoveryServiceRegs = new HashMap<ThingUID, ServiceRegistration<?>>();
-//        channelTypes = new CopyOnWriteArrayList();
-//        channelGroupTypes = new CopyOnWriteArrayList();
-    }
 
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
         return BroadlinkBindingConstants.SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.keySet().contains(thingTypeUID);

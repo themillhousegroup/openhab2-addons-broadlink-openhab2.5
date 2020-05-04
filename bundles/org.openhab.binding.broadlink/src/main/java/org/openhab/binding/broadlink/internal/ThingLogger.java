@@ -32,7 +32,7 @@ public final class ThingLogger  {
         this.logger = logger;
     }
 
-    private String describeStatus() {
+    String describeStatus() {
         if (Utils.isOnline(thing)) {
             return "^";
         }
@@ -42,37 +42,62 @@ public final class ThingLogger  {
         return "?";
     }
 
-    private Object[] prependUID(String msg, Object... args) {
-        Object[] allArgs = new Object[args.length + 3];
+    Object[] prependUID(Object... args) {
+        Object[] allArgs = new Object[args.length + 2];
         allArgs[0] = thing.getUID().toString().replaceFirst("^broadlink:", "");;
         allArgs[1] = describeStatus();
         System.arraycopy(args, 0, allArgs, 2, args.length);
-        allArgs[allArgs.length - 1] = msg;
         return allArgs;
     }
 
-    // FIXME: Passing a msg containing a {} does NOT work - variables are not substituted. Fix this mess.
+    Object[] appendMessage(Object[] args, String msg) {
+        Object[] allArgs = new Object[args.length + 1];
+        System.arraycopy(args, 0, allArgs, 0, args.length);
+        allArgs[args.length] = msg;
+        return allArgs;
+    }
+
     public void logDebug(String msg, Object... args) {
         if (logger.isDebugEnabled()) {
-            logger.debug("{}[{}]: {}", prependUID(msg, args == null ? new Object[0] : args));
+            if (args.length == 0) {
+                logger.debug("{}[{}]: {}", appendMessage(prependUID(), msg));
+            } else {
+                logger.debug("{}[{}]: " + msg, prependUID(args));
+            }
         }
     }
 
     public void logError(String msg, Object... args) {
-        logger.error("{}[{}]: {}", prependUID(msg, args == null ? new Object[0] : args));
+        if (args.length == 0) {
+            logger.error("{}[{}]: {}", appendMessage(prependUID(), msg));
+        } else {
+            logger.error("{}[{}]: " + msg, prependUID(args));
+        }
     }
 
     public void logWarn(String msg, Object... args) {
-        logger.warn("{}[{}]: {}", prependUID(msg, args == null ? new Object[0] : args));
+        if (args.length == 0) {
+            logger.warn("{}[{}]: {}", appendMessage(prependUID(), msg));
+        } else {
+            logger.warn("{}[{}]: " + msg, prependUID(args));
+        }
     }
 
     public void logInfo(String msg, Object... args) {
-        logger.info("{}[{}]: {}", prependUID(msg, args == null ? new Object[0] : args));
+        if (args.length == 0) {
+            logger.info("{}[{}]: {}", appendMessage(prependUID(), msg));
+        } else {
+            logger.info("{}[{}]: " + msg, prependUID(args));
+        }
     }
 
     public void logTrace(String msg, Object... args) {
         if (logger.isTraceEnabled()) {
-            logger.trace("{}[{}]: {}", prependUID(msg, args == null ? new Object[0] : args));
+            if (args.length == 0) {
+                logger.trace("{}[{}]: {}", appendMessage(prependUID(), msg));
+            } else {
+                logger.trace("{}[{}]: " + msg, prependUID(args));
+            }
         }
     }
 }

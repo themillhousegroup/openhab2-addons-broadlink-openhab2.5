@@ -15,13 +15,11 @@ package org.openhab.binding.broadlink.handler;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.thing.Thing;
-import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
 import org.openhab.binding.broadlink.internal.BroadlinkProtocol;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Remote blaster handler
@@ -57,8 +55,7 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
 
     protected void sendCode(byte code[]) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        BroadlinkDeviceConfiguration thingConfig = (BroadlinkDeviceConfiguration) getConfigAs(
-                BroadlinkDeviceConfiguration.class);
+
         try {
             // These devices use a 6-byte sendCode instead of the previous 4
             //https://github.com/mjg59/python-broadlink/blob/0.13.0/broadlink/__init__.py#L50 add RM4 list

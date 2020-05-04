@@ -13,11 +13,8 @@
 package org.openhab.binding.broadlink.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 /**
  * Handles conversions to/from hexadecimal.

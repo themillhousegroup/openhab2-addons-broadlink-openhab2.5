@@ -51,6 +51,10 @@ public class BroadlinkSocketModel2Handler extends BroadlinkSocketHandler {
             payload[0] = 1;
             byte message[] = buildMessage((byte) 106, payload);
             byte response[] = sendAndReceiveDatagram(message, "status for socket");
+            if (response == null) {
+                thingLogger.logError("Got nothing back while getting device status");
+                return false;
+            }
             byte decodedPayload[] = BroadlinkProtocol.decodePacket(response, thingConfig, editProperties());
             updateState("powerOn", deriveOnOffStateFromPayload(decodedPayload));
             return true;

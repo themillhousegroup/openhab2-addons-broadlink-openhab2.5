@@ -14,7 +14,6 @@ package org.openhab.binding.broadlink.handler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -24,7 +23,6 @@ import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
 import org.eclipse.smarthome.core.transform.*;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
 import org.openhab.binding.broadlink.internal.Hex;
 import org.openhab.binding.broadlink.internal.Utils;
 import org.osgi.framework.BundleContext;
@@ -50,8 +48,7 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
 
     protected void sendCode(byte code[]) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        BroadlinkDeviceConfiguration thingConfig = (BroadlinkDeviceConfiguration) getConfigAs(
-                BroadlinkDeviceConfiguration.class);
+
         try {
             byte[] abyte0 = new byte[4];
             abyte0[0] = 2;

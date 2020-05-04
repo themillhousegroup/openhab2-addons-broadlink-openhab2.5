@@ -25,17 +25,11 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 
 import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
-import org.openhab.binding.broadlink.internal.BroadlinkProtocol;
-import org.openhab.binding.broadlink.internal.Hex;
-import org.openhab.binding.broadlink.internal.ThingLogger;
-import org.openhab.binding.broadlink.internal.Utils;
-import org.openhab.binding.broadlink.internal.NetworkUtils;
+import org.openhab.binding.broadlink.internal.*;
 import org.openhab.binding.broadlink.internal.discovery.DeviceRediscoveryAgent;
 import org.openhab.binding.broadlink.internal.discovery.DeviceRediscoveryListener;
 import org.openhab.binding.broadlink.internal.socket.RetryableSocket;
 import org.slf4j.Logger;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Abstract superclass of all supported Broadlink devices.
@@ -45,7 +39,6 @@ import org.apache.commons.lang.StringUtils;
 @NonNullByDefault
 public abstract class BroadlinkBaseThingHandler extends BaseThingHandler implements DeviceRediscoveryListener {
 
-    private static final String EMPTY = "<empty>";
 
     @Nullable
     private RetryableSocket socket;
@@ -140,7 +133,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         try {
             byte authRequest[] = buildMessage((byte) 0x65, BroadlinkProtocol.buildAuthenticationPayload(), -1);
             byte response[] = sendAndReceiveDatagram(authRequest, "authentication");
-            byte decryptResponse[] = BroadlinkProtocol.decodePacket(response, thingConfig, null);
+            byte decryptResponse[] = BroadlinkProtocol.decodePacket(response, thingConfig, editProperties());
             byte deviceId[] = Utils.getDeviceId(decryptResponse);
             byte deviceKey[] = Utils.getDeviceKey(decryptResponse);
             setProperty("id", Hex.toHexString(deviceId));
@@ -304,14 +297,10 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     private void emptyProperty(String propName) {
-        setProperty(propName, EMPTY); // Apparently removing the property entirely breaks things; use a marker
+        setProperty(propName, PropertyUtils.EMPTY); // Apparently removing the property entirely breaks things; use a marker
     }
 
     private boolean isPropertyEmpty(String propName) {
-        Map<String, String> properties = editProperties();
-        if (properties.containsKey(propName)) {
-            return EMPTY.equals(properties.get(propName));
-        }
-        return true;
+        return PropertyUtils.isPropertyEmpty(editProperties(), propName);
     }
 }
