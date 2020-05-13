@@ -87,7 +87,7 @@ public class RetryableSocket {
             thingLogger.logTrace("Sending " + purpose + " complete");
             return true;
         } catch (IOException e) {
-            thingLogger.logError("IO error during UDP command sending " + purpose + " +: " + e.getMessage());
+            thingLogger.logError("IO error during UDP command sending " + purpose + " +: ", e);
             return false;
         }
     }
@@ -106,7 +106,7 @@ public class RetryableSocket {
         } catch (SocketTimeoutException ste) {
             thingLogger.logDebug("No further " + purpose + " response received for device");
         } catch (Exception e) {
-            thingLogger.logError("While " + purpose + " - IO Exception: '" + e.getMessage() + "'");
+            thingLogger.logError("While " + purpose, e);
         }
 
         return null;

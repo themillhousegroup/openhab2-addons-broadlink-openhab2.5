@@ -24,12 +24,19 @@ import org.slf4j.Logger;
 @NonNullByDefault
 public final class ThingLogger  {
 
+    private static final String STANDARD_LOG_PREFIX_FORMAT = "{}[{}]: ";
+    private static final String STANDARD_LOG_PREFIX_WITH_MSG_FORMAT = "{}[{}]: {}";
+
     private final Thing thing;
     private final Logger logger;
 
     public ThingLogger(Thing thing, Logger logger) {
         this.thing = thing;
         this.logger = logger;
+    }
+
+    String describeThing() {
+        return thing.getUID().toString().replaceFirst("^broadlink:", "");
     }
 
     String describeStatus() {
@@ -42,9 +49,9 @@ public final class ThingLogger  {
         return "?";
     }
 
-    Object[] prependUID(Object... args) {
+    Object[] prependDescription(Object... args) {
         Object[] allArgs = new Object[args.length + 2];
-        allArgs[0] = thing.getUID().toString().replaceFirst("^broadlink:", "");;
+        allArgs[0] = describeThing();
         allArgs[1] = describeStatus();
         System.arraycopy(args, 0, allArgs, 2, args.length);
         return allArgs;
@@ -60,43 +67,49 @@ public final class ThingLogger  {
     public void logDebug(String msg, Object... args) {
         if (logger.isDebugEnabled()) {
             if (args.length == 0) {
-                logger.debug("{}[{}]: {}", appendMessage(prependUID(), msg));
+                logger.debug(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
             } else {
-                logger.debug("{}[{}]: " + msg, prependUID(args));
+                logger.debug(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
             }
         }
     }
 
-    public void logError(String msg, Object... args) {
-        if (args.length == 0) {
-            logger.error("{}[{}]: {}", appendMessage(prependUID(), msg));
+    /**
+     * @param msg - a message describing an error
+     * @param t - zero-or-one Throwables to be logged
+     */
+    public void logError(String msg, Throwable... t) {
+        // BETA 8 - errors logged with their throwable to assist diagnosis
+        if (t.length == 0) {
+            logger.error(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
         } else {
-            logger.error("{}[{}]: " + msg, prependUID(args));
+            String message = describeThing() + "[" + describeStatus() + "]: " + msg;
+            logger.error(message, t[0]);
         }
     }
 
     public void logWarn(String msg, Object... args) {
         if (args.length == 0) {
-            logger.warn("{}[{}]: {}", appendMessage(prependUID(), msg));
+            logger.warn(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
         } else {
-            logger.warn("{}[{}]: " + msg, prependUID(args));
+            logger.warn(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
         }
     }
 
     public void logInfo(String msg, Object... args) {
         if (args.length == 0) {
-            logger.info("{}[{}]: {}", appendMessage(prependUID(), msg));
+            logger.info(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
         } else {
-            logger.info("{}[{}]: " + msg, prependUID(args));
+            logger.info(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
         }
     }
 
     public void logTrace(String msg, Object... args) {
         if (logger.isTraceEnabled()) {
             if (args.length == 0) {
-                logger.trace("{}[{}]: {}", appendMessage(prependUID(), msg));
+                logger.trace(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
             } else {
-                logger.trace("{}[{}]: " + msg, prependUID(args));
+                logger.trace(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
             }
         }
     }

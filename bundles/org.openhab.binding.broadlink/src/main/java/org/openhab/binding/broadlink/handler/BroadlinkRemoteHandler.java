@@ -130,16 +130,18 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
             value = transformService.transform(mapFile, command.toString());
             code = Hex.convertHexToBytes(value);
         } catch (TransformationException e) {
-            thingLogger.logError("Failed to transform {} for thing {} using map file '{}', exception={}",
-                    new Object[] { command, getThing().getLabel(), mapFile, e.getMessage() });
+            thingLogger.logError(
+            "Failed to transform command '" + command + "' for thing " + getThing().getLabel() + " using map file '" + mapFile + "'",
+            e);
             return null;
         }
         if (StringUtils.isEmpty(value)) {
-            thingLogger.logError("No entry for {} in map file '{}' for thing {}",
-                    new Object[] { command, mapFile, getThing().getLabel() });
+            thingLogger.logError(
+                "No entry for command '" + command + "' in map file '" + mapFile + "' for thing getThing().getLabel()"
+            );
             return null;
         }
-        thingLogger.logDebug("Transformed {} for thing {} with map file '{}'",
+        thingLogger.logDebug("Transformed command '{}' for thing {} with map file '{}'",
                 new Object[] { command, getThing().getLabel(), mapFile });
         return code;
     }

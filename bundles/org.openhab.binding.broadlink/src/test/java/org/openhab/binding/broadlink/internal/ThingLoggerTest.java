@@ -66,23 +66,23 @@ public class ThingLoggerTest {
 
     @Test
     public void prependArgumentsNoArgs() {
-        Object[] result = thingLogger.prependUID();
+        Object[] result = thingLogger.prependDescription();
         assertArrayEquals(new Object[] { "td1:1234", "^"}, result);
     }
     @Test
     public void prependArgumentsOneArg() {
-        Object[] result = thingLogger.prependUID( "a1");
+        Object[] result = thingLogger.prependDescription( "a1");
         assertArrayEquals(new Object[] { "td1:1234", "^", "a1" }, result);
     }
 
     @Test
     public void prependArgumentsTwoArgs() {
-        Object[] result = thingLogger.prependUID( "a1", "a2");
+        Object[] result = thingLogger.prependDescription( "a1", "a2");
         assertArrayEquals(new Object[] { "td1:1234", "^", "a1", "a2" }, result);
     }
     @Test
     public void prependArgumentsThreeArgs() {
-        Object[] result = thingLogger.prependUID( "a1", "a2", "a3");
+        Object[] result = thingLogger.prependDescription( "a1", "a2", "a3");
         assertArrayEquals(new Object[] { "td1:1234", "^", "a1", "a2", "a3" }, result);
     }
     @Test
@@ -143,18 +143,17 @@ public class ThingLoggerTest {
         );
     }
 
-
     @Test
-    public void logErrorPrependsThingInfoForZeroVarargs() {
+    public void logErrorPrependsThingInfoBeforeMessageWithNoThrowable() {
         ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logError("message");
+        thingLogger.logError("error message");
         verify(mockLogger).error(stringCaptor.capture(), argCaptor.capture());
         assertEquals("{}[{}]: {}", stringCaptor.getValue());
         List<Object> expected = new ArrayList<Object>();
         expected.add("td1:1234");
         expected.add("^");
-        expected.add("message");
+        expected.add("error message");
         assertEquals(
                 expected,
                 argCaptor.getAllValues()
@@ -162,36 +161,16 @@ public class ThingLoggerTest {
     }
 
     @Test
-    public void logErrorPrependsThingInfoForOneVararg() {
+    public void logErrorPrependsThingInfoBeforeThrowable() {
         ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logError("message with arg {}", "extra");
-        verify(mockLogger).error(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with arg {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
+        ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
+        Throwable t = new IllegalArgumentException("foo");
+        thingLogger.logError("error description", t);
+        verify(mockLogger).error(stringCaptor.capture(), throwableCaptor.capture());
+        assertEquals("td1:1234[^]: error description", stringCaptor.getValue());
         assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-    @Test
-    public void logErrorPrependsThingInfoForTwoVarargs() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logError("message with first {} second {}", "extra", "extra2");
-        verify(mockLogger).error(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with first {} second {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        expected.add("extra2");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
+                t,
+                throwableCaptor.getValue()
         );
     }
 

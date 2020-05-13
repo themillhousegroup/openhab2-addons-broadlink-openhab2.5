@@ -134,8 +134,8 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             byte authRequest[] = buildMessage((byte) 0x65, BroadlinkProtocol.buildAuthenticationPayload(), -1);
             byte response[] = sendAndReceiveDatagram(authRequest, "authentication");
             byte decryptResponse[] = BroadlinkProtocol.decodePacket(response, thingConfig, editProperties());
-            byte deviceId[] = Utils.getDeviceId(decryptResponse);
-            byte deviceKey[] = Utils.getDeviceKey(decryptResponse);
+            byte deviceId[] = BroadlinkProtocol.getDeviceId(decryptResponse);
+            byte deviceKey[] = BroadlinkProtocol.getDeviceKey(decryptResponse);
             setProperty("id", Hex.toHexString(deviceId));
             setProperty("key", Hex.toHexString(deviceKey));
             thingLogger.logDebug(
@@ -144,7 +144,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             authenticated = true;
             return true;
         } catch (Exception e) {
-            thingLogger.logError("Authentication failed: " + e.getMessage());
+            thingLogger.logError("Authentication failed: ", e);
             return false;
         }
 

@@ -203,4 +203,12 @@ public class BroadlinkProtocol {
         }
 
     }
+
+    public static byte[] getDeviceId(byte response[]) {
+        return Utils.slice(response, 0, 4);
+    }
+
+    public static byte[] getDeviceKey(byte response[]) {
+        return Utils.slice(response, 4, 20);
+    }
 }

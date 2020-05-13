@@ -32,13 +32,6 @@ import java.io.IOException;
 public class Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
-    public static byte[] getDeviceId(byte response[]) {
-        return slice(response, 0, 4);
-    }
-
-    public static byte[] getDeviceKey(byte response[]) {
-        return slice(response, 4, 20);
-    }
 
     public static boolean isOnline(Thing thing) {
         return thing.getStatus().equals(ThingStatus.ONLINE);
