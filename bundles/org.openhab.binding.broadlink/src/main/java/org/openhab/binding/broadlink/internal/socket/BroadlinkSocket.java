@@ -14,6 +14,7 @@ package org.openhab.binding.broadlink.internal.socket;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.core.util.HexUtils;
 import org.openhab.binding.broadlink.internal.Hex;
 import org.openhab.binding.broadlink.internal.ModelMapper;
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public class BroadlinkSocket {
                     byte remoteMAC[];
                     org.eclipse.smarthome.core.thing.ThingTypeUID deviceType;
                     int model;
-                    for (Iterator<BroadlinkSocketListener> iterator = (new ArrayList<BroadlinkSocketListener>(BroadlinkSocket.listeners)).iterator(); iterator.hasNext(); listener.onDataReceived(dgram.getAddress().getHostAddress(), dgram.getPort(), Hex.decodeMAC(remoteMAC), deviceType, model)) {
+                    for (Iterator<BroadlinkSocketListener> iterator = (new ArrayList<BroadlinkSocketListener>(BroadlinkSocket.listeners)).iterator(); iterator.hasNext(); listener.onDataReceived(dgram.getAddress().getHostAddress(), dgram.getPort(), HexUtils.bytesToHex(remoteMAC), deviceType, model)) {
                         listener = iterator.next();
                         byte receivedPacket[] = dgram.getData();
                         remoteMAC = Arrays.copyOfRange(receivedPacket, 58, 64);
@@ -76,7 +77,7 @@ public class BroadlinkSocket {
                 }
             } catch (IOException e) {
                 if (!isInterrupted())
-                    logger.error("Error while receiving '{}'", e);
+                    logger.error("Error while receiving", e);
             }
             BroadlinkSocket.logger.info("Receiver thread ended");
         }

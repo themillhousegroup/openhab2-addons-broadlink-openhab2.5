@@ -12,15 +12,17 @@
  */
 package org.openhab.binding.broadlink.internal;
 
-import java.net.*;
-import java.util.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import javax.crypto.spec.IvParameterSpec;
-
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.util.HexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.crypto.spec.IvParameterSpec;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.ProtocolException;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * Static methods for working with the Broadlink network prototcol.
@@ -180,11 +182,6 @@ public class BroadlinkProtocol {
     }
 
     public static byte[] decodePacket(byte[] packet, byte[] authorizationKey, String initializationVector) throws IOException {
-        // if a properties map is supplied, use it.
-        // During initial thing startup we don't have one yet, so use the auth key from
-        // the config.
-//        final String key = PropertyUtils.hasProperty(properties, "key") ? properties.get("key") : thingConfig.getAuthorizationKey();
-
         boolean error = (int) packet[0x22] != 0 || (int) packet[0x23] != 0;// || (int) packet[0x24] != 0;
         if (error) {
             throw new ProtocolException(
@@ -193,8 +190,7 @@ public class BroadlinkProtocol {
         }
 
         try {
-//            IvParameterSpec ivSpec = new IvParameterSpec(Hex.convertHexToBytes(thingConfig.getIV()));
-            IvParameterSpec ivSpec = new IvParameterSpec(Hex.fromHexString(initializationVector));
+            IvParameterSpec ivSpec = new IvParameterSpec(HexUtils.hexToBytes(initializationVector));
             return Utils.decrypt(authorizationKey, ivSpec, Utils.slice(packet, 56, 88));
         } catch (Exception ex) {
             throw new IOException("Failed while getting device status", ex);

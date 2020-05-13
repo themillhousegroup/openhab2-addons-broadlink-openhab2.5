@@ -12,23 +12,27 @@
  */
 package org.openhab.binding.broadlink.handler;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.core.thing.*;
+import org.eclipse.smarthome.core.thing.Channel;
+import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.type.ChannelTypeUID;
-import org.eclipse.smarthome.core.transform.*;
+import org.eclipse.smarthome.core.transform.TransformationException;
+import org.eclipse.smarthome.core.transform.TransformationHelper;
+import org.eclipse.smarthome.core.transform.TransformationService;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
-import org.openhab.binding.broadlink.internal.Hex;
+import org.eclipse.smarthome.core.util.HexUtils;
 import org.openhab.binding.broadlink.internal.Utils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * Remote blaster handler
@@ -128,7 +132,7 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
         String value;
         try {
             value = transformService.transform(mapFile, command.toString());
-            code = Hex.fromHexString(value);
+            code = HexUtils.hexToBytes(value);
         } catch (TransformationException e) {
             thingLogger.logError(
             "Failed to transform command '" + command + "' for thing " + getThing().getLabel() + " using map file '" + mapFile + "'",
