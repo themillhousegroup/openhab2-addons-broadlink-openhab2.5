@@ -128,7 +128,7 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
         String value;
         try {
             value = transformService.transform(mapFile, command.toString());
-            code = Hex.convertHexToBytes(value);
+            code = Hex.fromHexString(value);
         } catch (TransformationException e) {
             thingLogger.logError(
             "Failed to transform command '" + command + "' for thing " + getThing().getLabel() + " using map file '" + mapFile + "'",

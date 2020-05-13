@@ -108,7 +108,7 @@ public class BroadlinkStripModel1Handler extends BroadlinkBaseThingHandler {
         try {
             byte message[] = buildMessage((byte) 106, payload);
             byte response[] = sendAndReceiveDatagram(message, "status for strip");
-            byte decodedPayload[] = BroadlinkProtocol.decodePacket(response, thingConfig, editProperties());
+            byte decodedPayload[] = decodeDevicePacket(response);
             final int status = decodedPayload[14];
 
             this.updateState("s1powerOn", (status & 1) == 1 ? OnOffType.ON : OnOffType.OFF);

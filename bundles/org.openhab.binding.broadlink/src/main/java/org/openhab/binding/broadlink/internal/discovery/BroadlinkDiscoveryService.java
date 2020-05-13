@@ -70,14 +70,15 @@ public class BroadlinkDiscoveryService extends AbstractDiscoveryService
     }
 
     private void discoveryResultSubmission(String remoteAddress, int remotePort, String remoteMAC, ThingTypeUID thingTypeUID, int model) {
+        String modelAsHexString = String.format("%x", model);
         if (logger.isDebugEnabled()) {
-            logger.debug("Adding new Broadlink device on {} with mac '{}' to Smarthome inbox", remoteAddress, remoteMAC);
+            logger.debug("Adding new Broadlink device ({} => {}) at {} with mac '{}' to Smarthome inbox", modelAsHexString, thingTypeUID, remoteAddress, remoteMAC);
         }
         Map<String, Object> properties = new HashMap<String, Object>(6);
         properties.put("ipAddress", remoteAddress);
         properties.put("port", Integer.valueOf(remotePort));
         properties.put("mac", remoteMAC);
-        properties.put("deviceType", model);
+        properties.put("deviceType", modelAsHexString);
         ThingUID thingUID = new ThingUID(thingTypeUID, remoteMAC.replace(":", "-"));
         if (logger.isDebugEnabled()) {
             logger.debug("Device '{}' discovered at '{}'.", thingUID, remoteAddress);

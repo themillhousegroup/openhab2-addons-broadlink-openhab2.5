@@ -19,8 +19,6 @@ import java.io.IOException;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +32,7 @@ public class BroadlinkProtocol {
 
     private static final Logger logger = LoggerFactory.getLogger(BroadlinkProtocol.class);
 
-    public static byte[] buildMessage(byte command, byte[] payload, int count, byte[] mac, byte[] id, byte[] iv,
+    public static byte[] buildMessage(byte command, byte[] payload, int count, byte[] mac, byte[] deviceId, byte[] iv,
         byte[] key, int deviceType) {     
             byte packet[] = new byte[0x38];
         packet[0x00] = 0x5a;
@@ -59,10 +57,10 @@ public class BroadlinkProtocol {
         packet[0x2d] = mac[3];
         packet[0x2e] = mac[4];
         packet[0x2f] = mac[5];
-        packet[0x30] = id[0];
-        packet[0x31] = id[1];
-        packet[0x32] = id[2];
-        packet[0x33] = id[3];
+        packet[0x30] = deviceId[0];
+        packet[0x31] = deviceId[1];
+        packet[0x32] = deviceId[2];
+        packet[0x33] = deviceId[3];
         int checksum = 0xBEAF;
         int i = 0;
         byte abyte0[];
@@ -181,12 +179,11 @@ public class BroadlinkProtocol {
         return packet;
     }
 
-    public static byte[] decodePacket(byte[] packet, BroadlinkDeviceConfiguration thingConfig,
-            Map<String, String> properties) throws IOException {
+    public static byte[] decodePacket(byte[] packet, byte[] authorizationKey, String initializationVector) throws IOException {
         // if a properties map is supplied, use it.
         // During initial thing startup we don't have one yet, so use the auth key from
         // the config.
-        final String key = PropertyUtils.hasProperty(properties, "key") ? properties.get("key") : thingConfig.getAuthorizationKey();
+//        final String key = PropertyUtils.hasProperty(properties, "key") ? properties.get("key") : thingConfig.getAuthorizationKey();
 
         boolean error = (int) packet[0x22] != 0 || (int) packet[0x23] != 0;// || (int) packet[0x24] != 0;
         if (error) {
@@ -196,8 +193,9 @@ public class BroadlinkProtocol {
         }
 
         try {
-            IvParameterSpec ivSpec = new IvParameterSpec(Hex.convertHexToBytes(thingConfig.getIV()));
-            return Utils.decrypt(Hex.fromHexString(key), ivSpec, Utils.slice(packet, 56, 88));
+//            IvParameterSpec ivSpec = new IvParameterSpec(Hex.convertHexToBytes(thingConfig.getIV()));
+            IvParameterSpec ivSpec = new IvParameterSpec(Hex.fromHexString(initializationVector));
+            return Utils.decrypt(authorizationKey, ivSpec, Utils.slice(packet, 56, 88));
         } catch (Exception ex) {
             throw new IOException("Failed while getting device status", ex);
         }

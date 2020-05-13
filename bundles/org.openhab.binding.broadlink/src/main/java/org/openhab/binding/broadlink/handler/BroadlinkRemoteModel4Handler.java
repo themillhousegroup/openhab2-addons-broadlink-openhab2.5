@@ -15,7 +15,6 @@ package org.openhab.binding.broadlink.handler;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.thing.Thing;
-import org.openhab.binding.broadlink.internal.BroadlinkProtocol;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -43,7 +42,7 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
             payload[0] = 1;
             byte message[] = buildMessage((byte)106, payload);
             byte response[] = sendAndReceiveDatagram(message, "RM4 device status");
-            byte decodedPayload[] = BroadlinkProtocol.decodePacket(response, thingConfig, editProperties());
+            byte decodedPayload[] = decodeDevicePacket(response);
             float temperature = (float)((double)(decodedPayload[4] * 10 + decodedPayload[5]) / 10D);
             updateState("temperature", new DecimalType(temperature));
             return true;

@@ -13,6 +13,7 @@
 package org.openhab.binding.broadlink.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 
@@ -44,11 +45,6 @@ public class Hex {
         return sb.toString();
     }
 
-    // FIXME: Why do both of these exist?
-    public static byte[] convertHexToBytes(String code) {
-        return DatatypeConverter.parseHexBinary(code);
-    }
-
     public static byte[] fromHexString(String hex) {
         if (hex.length() % 2 != 0) throw new IllegalArgumentException("Input string must contain an even number of characters");
 
@@ -73,5 +69,16 @@ public class Hex {
         }
 
         return hex.toString();
+    }
+
+    public static boolean isDifferent(byte[] b1, byte[] b2) {
+        if (b1.length != b2.length) return true;
+        int j = b1.length;
+        for(int i = 0; i < j; i++) {
+            if (b1[i] != b2[i]) {
+                return true;
+            }
+        }
+        return false;
     }
 }

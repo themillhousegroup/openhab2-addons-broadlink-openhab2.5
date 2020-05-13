@@ -15,7 +15,6 @@ package org.openhab.binding.broadlink.handler;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.*;
-import org.openhab.binding.broadlink.internal.BroadlinkProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class BroadlinkSocketModel2Handler extends BroadlinkSocketHandler {
                 thingLogger.logError("Got nothing back while getting device status");
                 return false;
             }
-            byte decodedPayload[] = BroadlinkProtocol.decodePacket(response, thingConfig, editProperties());
+            byte decodedPayload[] = decodeDevicePacket(response);
             updateState("powerOn", deriveOnOffStateFromPayload(decodedPayload));
             return true;
         } catch (Exception ex) {

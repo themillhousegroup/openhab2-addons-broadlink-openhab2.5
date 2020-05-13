@@ -42,41 +42,40 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
 
     @Nullable
     private RetryableSocket socket;
-    private boolean authenticated = false;
     private int count;
-    @Nullable
-    private String authenticationKey;
-    @Nullable
-    private String iv;
+
     protected BroadlinkDeviceConfiguration thingConfig;
     protected final ThingLogger thingLogger;
     @Nullable
     private ScheduledFuture<?> refreshHandle;
+    // These get handed to us by the device after successful authentication:
+    private byte[] deviceId;
+    private byte[] deviceKey;
 
     public BroadlinkBaseThingHandler(Thing thing, Logger logger) {
         super(thing);
         this.thingLogger = new ThingLogger(thing, logger);
         this.thingConfig = (BroadlinkDeviceConfiguration) getConfigAs(BroadlinkDeviceConfiguration.class);
-        count = 0;
+        count = (new Random()).nextInt(65535);
+
+        // Set the default instance variables, such that the first buildMessage (used to authenticate) will work:
+        this.deviceId = Hex.fromHexString(INITIAL_DEVICE_ID); // resetDeviceId()
+        this.deviceKey = Hex.fromHexString(thingConfig.getAuthorizationKey());
+
+        this.socket = new RetryableSocket(thingConfig, thingLogger);
+    }
+
+    private static final String INITIAL_DEVICE_ID = "00000000";
+    private void resetDeviceId() {
+        this.deviceId = Hex.fromHexString(INITIAL_DEVICE_ID);
     }
 
     private boolean hasAuthenticated() {
-        return this.authenticated;
+        return Hex.isDifferent(this.deviceId, Hex.fromHexString(INITIAL_DEVICE_ID));
     }
 
     public void initialize() {
-        thingLogger.logDebug("initializing");
-
-        count = (new Random()).nextInt(65535);
-
-        this.socket = new RetryableSocket(thingConfig, thingLogger);
-        if (iv != thingConfig.getIV() || authenticationKey != thingConfig.getAuthorizationKey()) {
-            iv = thingConfig.getIV();
-            authenticationKey = thingConfig.getAuthorizationKey();
-            emptyProperty("id");
-            emptyProperty("key");
-        }
-        thingLogger.logDebug("initialization complete. Updating status.");
+        thingLogger.logDebug("initializing polling");
 
         if (thingConfig.getPollingInterval() != 0) {
             refreshHandle = scheduler.scheduleWithFixedDelay(
@@ -97,19 +96,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
 
     public void thingUpdated(Thing thing) {
         thingLogger.logDebug("thingUpdated");
-        if (iv != thingConfig.getIV() || authenticationKey != thingConfig.getAuthorizationKey()) {
-            thingLogger.logTrace("thing IV / Key has changed; re-authenticating");
-            iv = thingConfig.getIV();
-            authenticationKey = thingConfig.getAuthorizationKey();
-            if (authenticate()) {
-                updateStatus(ThingStatus.ONLINE);
-            } else {
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR);
-            }
-        } else {
-            thingLogger.logTrace("thing IV / Key has not changed; will not re-authenticate");
-        }
-        updateItemStatus();
+        forceOffline(ThingStatusDetail.CONFIGURATION_PENDING, "Thing has been updated, will reconnect soon");
     }
 
     public void dispose() {
@@ -126,22 +113,25 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     protected boolean authenticate() {
-        thingLogger.logDebug("Authenticating with packet count = " + this.count);
-
-        authenticated = false;
+        thingLogger.logDebug("Authenticating");
 
         try {
             byte authRequest[] = buildMessage((byte) 0x65, BroadlinkProtocol.buildAuthenticationPayload(), -1);
             byte response[] = sendAndReceiveDatagram(authRequest, "authentication");
-            byte decryptResponse[] = BroadlinkProtocol.decodePacket(response, thingConfig, editProperties());
-            byte deviceId[] = BroadlinkProtocol.getDeviceId(decryptResponse);
-            byte deviceKey[] = BroadlinkProtocol.getDeviceKey(decryptResponse);
-            setProperty("id", Hex.toHexString(deviceId));
-            setProperty("key", Hex.toHexString(deviceKey));
+            byte decryptResponse[] = decodeDevicePacket(response);
+            deviceId = BroadlinkProtocol.getDeviceId(decryptResponse);
+            deviceKey = BroadlinkProtocol.getDeviceKey(decryptResponse);
+
+            // Update the properties, so that these values can be seen in the UI:
+            Map<String, String> properties = editProperties();
+            properties.put("id", Hex.toHexString(deviceId));
+            properties.put("key", Hex.toHexString(deviceKey));
+            updateProperties(properties);
             thingLogger.logDebug(
-            "Authenticated with id '" + Hex.toHexString(deviceId) + "' and key '" + Hex.toHexString(deviceKey) + "'."
+            "Authenticated with id '{}' and key '{}'",
+                Hex.toHexString(deviceId),
+                Hex.toHexString(deviceKey)
             );
-            authenticated = true;
             return true;
         } catch (Exception e) {
             thingLogger.logError("Authentication failed: ", e);
@@ -159,33 +149,29 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
     
     protected byte[] buildMessage(byte command, byte payload[], int deviceType) throws IOException {
-        Map<String, String> properties = editProperties();
-        byte id[];
-        if (isPropertyEmpty("id")) {
-            id = new byte[4];
-            Arrays.fill(id, (byte)0);
-        } else {
-            id = Hex.fromHexString(properties.get("id"));
-        }
-        byte key[];
-        if (isPropertyEmpty("key") || isPropertyEmpty("id")) {
-            key = Hex.convertHexToBytes(thingConfig.getAuthorizationKey());
-            thingLogger.logTrace("key is empty; get from thingConfig" + Arrays.toString(key));
-        } else {
-            key = Hex.fromHexString(properties.get("key"));
-            thingLogger.logTrace("key is full; get from properties" + Arrays.toString(key));
-        }
         count = count + 1 & 0xffff;
-        thingLogger.logTrace("building message with count: " + count + ", id: " + Hex.toHexString(id) + ", key: " +Hex.toHexString(key));
+        thingLogger.logTrace("building message with count: {}, deviceId: {}, deviceKey: {}",
+            count,
+            Hex.toHexString(deviceId),
+            Hex.toHexString(deviceKey)
+        );
         return BroadlinkProtocol.buildMessage(
-                command,
-                payload,
-                count,
-                thingConfig.getMAC(),
-                id,
-                Hex.convertHexToBytes(thingConfig.getIV()),
-                key,
-                deviceType
+            command,
+            payload,
+            count,
+            thingConfig.getMAC(),
+            deviceId,
+            Hex.fromHexString(thingConfig.getIV()),
+            deviceKey,
+            deviceType
+        );
+    }
+
+    protected byte[] decodeDevicePacket(byte[] responseBytes) throws IOException {
+        return BroadlinkProtocol.decodePacket(
+            responseBytes,
+            this.deviceKey,
+            thingConfig.getIV()
         );
     }
 
@@ -211,9 +197,11 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     public void updateItemStatus() {
-        thingLogger.logTrace("updateItemStatus; checking host availability at " + thingConfig.getIpAddress());
+        thingLogger.logTrace("updateItemStatus; checking host availability at {}", thingConfig.getIpAddress());
         if (NetworkUtils.hostAvailabilityCheck(thingConfig.getIpAddress(), 3000)) {
+            thingLogger.logTrace("updateItemStatus; host found at {}", thingConfig.getIpAddress());
             if (!Utils.isOnline(getThing())) {
+                thingLogger.logTrace("updateItemStatus; device not currently online, resolving");
                 transitionToOnline();
             } else {
                 // Normal operation ...
@@ -223,18 +211,18 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
                         thingLogger.logWarn("Problem getting status. Not marking offline because configured to ignore failed updates ...");
                     } else {
                         thingLogger.logError("Problem getting status. Marking as offline ...");
-                        forceOffline();
+                        forceOffline(ThingStatusDetail.GONE,"Problem getting status");
                     }
                 }
             }
         } else {
             if (thingConfig.isStaticIp()) {
                 if (!Utils.isOffline(getThing())) {
-                    thingLogger.logDebug("Statically-IP-addressed device not found at " + thingConfig.getIpAddress());
-                    forceOffline();
+                    thingLogger.logDebug("Statically-IP-addressed device not found at {}", thingConfig.getIpAddress());
+                    forceOffline(ThingStatusDetail.GONE,"Couldn't find statically-IP-addressed device");
                 }
             } else {
-                thingLogger.logDebug("Dynamic IP device not found at " + thingConfig.getIpAddress() + ", will search...");
+                thingLogger.logDebug("Dynamic IP device not found at {}, will search...", thingConfig.getIpAddress());
                 DeviceRediscoveryAgent dra = new DeviceRediscoveryAgent(thingConfig, this);
                 dra.attemptRediscovery();
                 thingLogger.logDebug("Asynchronous dynamic IP device search initiated...");
@@ -243,7 +231,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     public void onDeviceRediscovered(String newIpAddress) {
-        thingLogger.logInfo("Rediscovered this device at IP " + newIpAddress);
+        thingLogger.logInfo("Rediscovered this device at IP {}", newIpAddress);
         thingConfig.setIpAddress(newIpAddress);
         transitionToOnline();
     }
@@ -251,7 +239,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     public void onDeviceRediscoveryFailure() {
         if (!Utils.isOffline(getThing())) {
             thingLogger.logDebug("Dynamically-IP-addressed device not found after network scan. Marking offline");
-            forceOffline();
+            forceOffline(ThingStatusDetail.GONE,"Couldn't rediscover device");
         }
     }
 
@@ -262,45 +250,29 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
                 thingLogger.logDebug("Authenticated with newly-detected device, will now get its status");
             } else {
                 thingLogger.logError("Attempting to authenticate prior to getting device status FAILED. Will mark as offline");
-                forceOffline();
+                forceOffline(ThingStatusDetail.COMMUNICATION_ERROR,"Couldn't authenticate");
                 return;
             }
         }
         if (onBroadlinkDeviceBecomingReachable()) {
-            thingLogger.logDebug("updateStatus: Offline -> Online");
+            thingLogger.logDebug("Offline -> Online");
             updateStatus(ThingStatus.ONLINE);
         } else {
             thingLogger.logError("Device became reachable but had trouble getting status. Marking as offline ...");
-            forceOffline();
+            forceOffline(ThingStatusDetail.COMMUNICATION_ERROR, "Trouble getting status");
         }
     }
 
-    private void forceOffline() {
-        thingLogger.logError("updateItemStatus: Online -> Offline");
-        this.authenticated = false; // This session is dead; we'll need to re-authenticate next time
-        emptyProperty("id");
-        emptyProperty("key");
+    private void forceOffline(ThingStatusDetail detail, String reason) {
+        thingLogger.logWarn("Online -> Offline due to: {}", reason);
+        resetDeviceId(); // This session is dead; we'll need to re-authenticate next time
         updateStatus(
                 ThingStatus.OFFLINE,
-                ThingStatusDetail.COMMUNICATION_ERROR,
-                (new StringBuilder("Could not find device at IP address ")).append(thingConfig.getIpAddress()).toString()
+                detail,
+                reason
         );
         if (socket != null) {
             socket.close();
         }
-    }
-
-    private void setProperty(String propName, String propValue) {
-        Map<String, String> properties = editProperties();
-        properties.put(propName, propValue);
-        updateProperties(properties);
-    }
-
-    private void emptyProperty(String propName) {
-        setProperty(propName, PropertyUtils.EMPTY); // Apparently removing the property entirely breaks things; use a marker
-    }
-
-    private boolean isPropertyEmpty(String propName) {
-        return PropertyUtils.isPropertyEmpty(editProperties(), propName);
     }
 }
