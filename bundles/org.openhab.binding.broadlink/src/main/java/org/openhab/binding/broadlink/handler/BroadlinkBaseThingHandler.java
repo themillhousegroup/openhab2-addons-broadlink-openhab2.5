@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 @NonNullByDefault
 public abstract class BroadlinkBaseThingHandler extends BaseThingHandler implements DeviceRediscoveryListener {
 
+    private static final String INITIAL_DEVICE_ID = "00000000";
 
     @Nullable
     private RetryableSocket socket;
@@ -52,30 +53,27 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     protected final ThingLogger thingLogger;
     @Nullable
     private ScheduledFuture<?> refreshHandle;
+    private boolean authenticated = false;
     // These get handed to us by the device after successful authentication:
     private byte[] deviceId;
     private byte[] deviceKey;
+
 
     public BroadlinkBaseThingHandler(Thing thing, Logger logger) {
         super(thing);
         this.thingLogger = new ThingLogger(thing, logger);
         this.thingConfig = (BroadlinkDeviceConfiguration) getConfigAs(BroadlinkDeviceConfiguration.class);
         count = (new Random()).nextInt(65535);
-
-        // Set the default instance variables, such that the first buildMessage (used to authenticate) will work:
-        this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID); // resetDeviceId()
+        thingLogger.logTrace("constructed: resetting deviceKey to {}", thingConfig.getAuthorizationKey());
+        this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID);
         this.deviceKey = HexUtils.hexToBytes(thingConfig.getAuthorizationKey());
 
         this.socket = new RetryableSocket(thingConfig, thingLogger);
     }
 
-    private static final String INITIAL_DEVICE_ID = "00000000";
-    private void resetDeviceId() {
-        this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID);
-    }
 
     private boolean hasAuthenticated() {
-        return Hex.isDifferent(this.deviceId, HexUtils.hexToBytes(INITIAL_DEVICE_ID));
+        return authenticated;
     }
 
     public void initialize() {
@@ -116,15 +114,19 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         super.dispose();
     }
 
-    protected boolean authenticate() {
-        thingLogger.logDebug("Authenticating");
+    private boolean authenticate() {
+        thingLogger.logTrace("Authenticating");
+        authenticated = false;
+        // When authenticating, we must ALWAYS use the initial values
+        this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID);
+        this.deviceKey = HexUtils.hexToBytes(thingConfig.getAuthorizationKey());
 
         try {
             byte authRequest[] = buildMessage((byte) 0x65, BroadlinkProtocol.buildAuthenticationPayload(), -1);
             byte response[] = sendAndReceiveDatagram(authRequest, "authentication");
             byte decryptResponse[] = decodeDevicePacket(response);
-            deviceId = BroadlinkProtocol.getDeviceId(decryptResponse);
-            deviceKey = BroadlinkProtocol.getDeviceKey(decryptResponse);
+            this.deviceId = BroadlinkProtocol.getDeviceId(decryptResponse);
+            this.deviceKey = BroadlinkProtocol.getDeviceKey(decryptResponse);
 
             // Update the properties, so that these values can be seen in the UI:
             Map<String, String> properties = editProperties();
@@ -136,6 +138,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
                 HexUtils.bytesToHex(deviceId),
                 HexUtils.bytesToHex(deviceKey)
             );
+            authenticated = true;
             return true;
         } catch (Exception e) {
             thingLogger.logError("Authentication failed: ", e);
@@ -269,7 +272,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
 
     private void forceOffline(ThingStatusDetail detail, String reason) {
         thingLogger.logWarn("Online -> Offline due to: {}", reason);
-        resetDeviceId(); // This session is dead; we'll need to re-authenticate next time
+        authenticated = false; // This session is dead; we'll need to re-authenticate next time
         updateStatus(
                 ThingStatus.OFFLINE,
                 detail,

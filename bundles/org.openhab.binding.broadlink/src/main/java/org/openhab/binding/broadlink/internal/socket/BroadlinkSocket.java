@@ -15,7 +15,6 @@ package org.openhab.binding.broadlink.internal.socket;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.util.HexUtils;
-import org.openhab.binding.broadlink.internal.Hex;
 import org.openhab.binding.broadlink.internal.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +50,25 @@ public class BroadlinkSocket {
         datagramPacket = new DatagramPacket(buffer, buffer.length);
     }
 
+    public static String decodeMAC(byte mac[])  {
+        if (mac.length < 6) {
+            throw new RuntimeException("Insufficient MAC bytes provided, cannot decode it");
+        }
+
+        StringBuilder sb = new StringBuilder(18);
+        for(int i = 5; i >= 0; i--)
+        {
+            if (sb.length() > 0) {
+                sb.append(':');
+            }
+            sb.append(String.format("%02x", new Object[] {
+                    Byte.valueOf(mac[i])
+            }));
+        }
+
+        return sb.toString();
+    }
+
     @NonNullByDefault
     private static class ReceiverThread extends Thread {
 
@@ -66,7 +84,7 @@ public class BroadlinkSocket {
                     byte remoteMAC[];
                     org.eclipse.smarthome.core.thing.ThingTypeUID deviceType;
                     int model;
-                    for (Iterator<BroadlinkSocketListener> iterator = (new ArrayList<BroadlinkSocketListener>(BroadlinkSocket.listeners)).iterator(); iterator.hasNext(); listener.onDataReceived(dgram.getAddress().getHostAddress(), dgram.getPort(), HexUtils.bytesToHex(remoteMAC), deviceType, model)) {
+                    for (Iterator<BroadlinkSocketListener> iterator = (new ArrayList<BroadlinkSocketListener>(BroadlinkSocket.listeners)).iterator(); iterator.hasNext(); listener.onDataReceived(dgram.getAddress().getHostAddress(), dgram.getPort(), decodeMAC(remoteMAC), deviceType, model)) {
                         listener = iterator.next();
                         byte receivedPacket[] = dgram.getData();
                         remoteMAC = Arrays.copyOfRange(receivedPacket, 58, 64);
