@@ -41,7 +41,7 @@ public class ModelMapper {
         if (model == 0x2720)
             return BroadlinkBindingConstants.THING_TYPE_SP2; // SPMini
         if (model == 0x753e)
-            return BroadlinkBindingConstants.THING_TYPE_SP3; // SP3
+            return BroadlinkBindingConstants.THING_TYPE_SP3; // SP mini 3 - does NOT have a nightlight
         if (model == 0x7d00)
             return BroadlinkBindingConstants.THING_TYPE_SP3; // OEM-branded SP3
         if (model == 0x947a || model == 0x9479)

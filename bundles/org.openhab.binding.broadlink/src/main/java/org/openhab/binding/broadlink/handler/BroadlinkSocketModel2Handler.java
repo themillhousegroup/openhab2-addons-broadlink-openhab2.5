@@ -15,13 +15,14 @@ package org.openhab.binding.broadlink.handler;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.*;
+import org.eclipse.smarthome.core.types.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 /**
- * Smart power socket handler
+ * Smart power socket handler with (optional) nightlight
  *
  * @author John Marshall/Cato Sognen - Initial contribution
  */
@@ -40,22 +41,57 @@ public class BroadlinkSocketModel2Handler extends BroadlinkSocketHandler {
         byte payload[] = new byte[16];
         payload[0] = 2;
         payload[4] = (byte) status;
-        byte message[] = buildMessage((byte) 106, payload);
-        sendAndReceiveDatagram(message, "Setting SP2/3 status");
+        byte message[] = buildMessage((byte) 0x6a, payload);
+        sendAndReceiveDatagram(message, "Setting SP2/3 status to " + status);
+    }
+
+    static int mergeOnOffBits(Command powerOnOff, Command nightLightOnOff) {
+        int powerBit = powerOnOff == OnOffType.ON ? 0x01 : 0x00;
+        int nightLightBit = nightLightOnOff == OnOffType.ON ? 0x02 : 0x00;
+        return powerBit | nightLightBit;
+    }
+
+    private static OnOffType deriveOnOffBitFromStatusPayload(byte[] statusPayload, byte mask) {
+        byte powerByte = statusPayload[4];
+        if ((powerByte & mask) == mask) {
+            return OnOffType.ON;
+        }
+        return OnOffType.OFF;
+    }
+
+    static OnOffType derivePowerStateFromStatusByte(byte[] statusPayload) {
+        return deriveOnOffBitFromStatusPayload(statusPayload, (byte) 0x01);
+    }
+
+    static OnOffType deriveNightLightStateFromStatusByte(byte[] statusPayload) {
+        return deriveOnOffBitFromStatusPayload(statusPayload, (byte) 0x02);
+    }
+
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        try {
+            // Always pull back the latest device status and merge it:
+            byte[] statusByte = getStatusByteFromDevice();
+            OnOffType powerStatus = derivePowerStateFromStatusByte(statusByte);
+            OnOffType nightLightStatus = deriveNightLightStateFromStatusByte(statusByte);
+
+            if (channelUID.getId().equals("powerOn")) {
+                setStatusOnDevice(mergeOnOffBits(command, nightLightStatus));
+            }
+
+            if (channelUID.getId().equals("nightLight")) {
+                setStatusOnDevice(mergeOnOffBits(powerStatus, command));
+            }
+        } catch (IOException e) {
+            thingLogger.logError("Could not send command to socket device", e);
+        }
     }
 
     protected boolean getStatusFromDevice() {
         try {
-            byte payload[] = new byte[16];
-            payload[0] = 1;
-            byte message[] = buildMessage((byte) 106, payload);
-            byte response[] = sendAndReceiveDatagram(message, "status for socket");
-            if (response == null) {
-                thingLogger.logError("Got nothing back while getting device status");
-                return false;
-            }
-            byte decodedPayload[] = decodeDevicePacket(response);
-            updateState("powerOn", deriveOnOffStateFromPayload(decodedPayload));
+            thingLogger.logInfo("SP2/SP3 getting status...");
+            byte[] statusByte = getStatusByteFromDevice();
+            updateState("powerOn", derivePowerStateFromStatusByte(statusByte));
+            updateState("nightLight", deriveNightLightStateFromStatusByte(statusByte));
             return true;
         } catch (Exception ex) {
             thingLogger.logError("Exception while getting status from device", ex);
@@ -63,15 +99,15 @@ public class BroadlinkSocketModel2Handler extends BroadlinkSocketHandler {
         }
     }
 
-    private OnOffType deriveOnOffStateFromPayload(byte[] payload) {
-        // Credit to the Python Broadlink implementation for this:
-        // https://github.com/mjg59/python-broadlink/blob/master/broadlink/__init__.py
-        // Function check_power does more than just check if payload[4] == 1 !
-        byte powerByte = payload[4];
-        if (powerByte == 1 || powerByte == 3 || powerByte == 0xFD) {
-            return OnOffType.ON;
+    private byte[] getStatusByteFromDevice() throws IOException {
+        byte payload[] = new byte[16];
+        payload[0] = 1;
+        byte message[] = buildMessage((byte) 0x6a, payload);
+        byte response[] = sendAndReceiveDatagram(message, "SP2/3 status byte");
+        if (response == null) {
+            throw new IOException("No response while fetching status byte from SP2/3 device");
         }
-        return OnOffType.OFF;
+        return decodeDevicePacket(response);
     }
 
     protected boolean onBroadlinkDeviceBecomingReachable() {

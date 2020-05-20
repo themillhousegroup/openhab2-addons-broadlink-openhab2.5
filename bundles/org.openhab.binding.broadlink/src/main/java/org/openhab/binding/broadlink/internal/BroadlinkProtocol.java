@@ -181,7 +181,11 @@ public class BroadlinkProtocol {
         return packet;
     }
 
+    public static final int MIN_RESPONSE_PACKET_LENGTH = 0x24;
     public static byte[] decodePacket(byte[] packet, byte[] authorizationKey, String initializationVector) throws IOException {
+        if (packet.length < MIN_RESPONSE_PACKET_LENGTH) {
+            throw new ProtocolException("Unexpectedly short packet; length " + packet.length + " is shorter than protocol minimum " + MIN_RESPONSE_PACKET_LENGTH);
+        }
         boolean error = (int) packet[0x22] != 0 || (int) packet[0x23] != 0;// || (int) packet[0x24] != 0;
         if (error) {
             throw new ProtocolException(

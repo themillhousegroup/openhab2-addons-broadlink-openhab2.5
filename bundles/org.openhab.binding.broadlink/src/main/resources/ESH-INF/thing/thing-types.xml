@@ -72,9 +72,10 @@
 	</thing-type>
 	<thing-type id="sp2">
 	<label>Broadlink SP2</label>
-	<description>The Broadlink SP2 is a smart socket with Wi-Fi connectivity.</description>
+	<description>The Broadlink SP2 is a smart socket with night light and Wi-Fi connectivity.</description>
 	<channels>
 		<channel id="powerOn" typeId="powerOn" />
+		<channel id="nightLight" typeId="nightLight" />
 		<channel id="powerConsumption" typeId="powerConsumption" />
 	</channels>
 	<config-description>
@@ -144,10 +145,10 @@
 	</thing-type>
 	<thing-type id="sp3">
 		<label>Broadlink SP3</label>
-		<description>The Broadlink SP3 is a smart socket with night light and Wi-Fi connectivity.</description>
+		<description>The Broadlink SP3 is a Wi-Fi smart socket with night light. The SP mini 3 omits the night light.</description>
 		<channels>
 			<channel id="powerOn" typeId="powerOn" />
-			<channel id="powerConsumption" typeId="powerConsumption" />
+			<channel id="nightLight" typeId="nightLight" />
 		</channels>
 		<config-description>
 			<parameter name="ipAddress" type="text">
@@ -866,6 +867,11 @@
 	<item-type>Switch</item-type>
 	<label>Power On/Off</label>
 	<category>PowerOutlet</category>
+	</channel-type>
+	<channel-type id="nightLight" advanced="true">
+		<item-type>Switch</item-type>
+		<label>Nightlight On/Off</label>
+		<category>PowerOutlet</category>
 	</channel-type>
 	<channel-type id="powerConsumption" advanced="true">
 	<item-type>Number</item-type>
