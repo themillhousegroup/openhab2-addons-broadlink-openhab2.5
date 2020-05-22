@@ -64,7 +64,13 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         this.thingLogger = new ThingLogger(thing, logger);
         this.thingConfig = (BroadlinkDeviceConfiguration) getConfigAs(BroadlinkDeviceConfiguration.class);
         count = (new Random()).nextInt(65535);
-        thingLogger.logTrace("constructed: resetting deviceKey to {}", thingConfig.getAuthorizationKey());
+
+        thingLogger.logInfo(
+            "constructed: resetting deviceKey to '{}', length {}",
+            thingConfig.getAuthorizationKey(),
+            thingConfig.getAuthorizationKey().length()
+        );
+        thingLogger.logInfo("(HINT: this should start '0976', end '8b02' and have length 32)");
         this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID);
         this.deviceKey = HexUtils.hexToBytes(thingConfig.getAuthorizationKey());
 
