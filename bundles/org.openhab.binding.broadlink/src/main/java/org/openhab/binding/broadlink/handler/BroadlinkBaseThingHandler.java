@@ -85,6 +85,8 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     public void initialize() {
         thingLogger.logDebug("initializing polling");
 
+        updateItemStatus();
+
         if (thingConfig.getPollingInterval() != 0) {
             refreshHandle = scheduler.scheduleWithFixedDelay(
                     new Runnable() {
@@ -97,8 +99,6 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
                     thingConfig.getPollingInterval(),
                     TimeUnit.SECONDS
             );
-        } else {
-            updateItemStatus();
         }
     }
 
@@ -161,7 +161,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         return buildMessage(command, payload, thingConfig.getDeviceType());
     }
     
-    protected byte[] buildMessage(byte command, byte payload[], int deviceType) throws IOException {
+    private byte[] buildMessage(byte command, byte payload[], int deviceType) throws IOException {
         count = count + 1 & 0xffff;
         thingLogger.logTrace("building message with count: {}, deviceId: {}, deviceKey: {}",
             count,
