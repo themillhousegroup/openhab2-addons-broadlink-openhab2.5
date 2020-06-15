@@ -42,36 +42,12 @@ import static org.junit.Assert.*;
 import static org.openhab.binding.broadlink.handler.BroadlinkSocketModel2Handler.*;
 
 
-public class BroadlinkSocketModel2HandlerTest {
-
-    private ThingImpl thing;
-
-    private Map<String, Object> properties;
-    private Configuration config;
-
-    @Mock
-    private RetryableSocket mockSocket;
-
-    @Mock
-    private NetworkTrafficObserver trafficObserver;
-
-    @Mock
-    private ThingHandlerCallback mockCallback;
-
-    @Mock
-    private Configuration mockConfiguration;
+public class BroadlinkRemoteModel2HandlerTest extends AbstractBroadlinkThingHandlerTest {
 
     @Before
     public void setUp() {
-        properties = new HashMap<>();
-        properties.put("authorizationKey", "097628343fe99e23765c1513accf8b02");
-        properties.put("mac", "AB:CD:AB:CD:AB:CD");
-        properties.put("iv", "562e17996d093d28ddb3ba695a2e6f58");
-        config = new Configuration(properties);
+        configureUnderlyingThing(BroadlinkBindingConstants.THING_TYPE_RM2, "rm2-test");
         MockitoAnnotations.initMocks(this);
-        ThingTypeUID thingTypeUID = BroadlinkBindingConstants.THING_TYPE_RM2;
-        thing = new ThingImpl(thingTypeUID, "rm2-test");
-        thing.setConfiguration(config);
     }
 
     @Test
@@ -163,20 +139,21 @@ public class BroadlinkSocketModel2HandlerTest {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         };
-        ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
+        ArgumentCaptor<Byte> commandCaptor = ArgumentCaptor.forClass(Byte.class);
+        ArgumentCaptor<byte[]> byteArrayCaptor = ArgumentCaptor.forClass(byte[].class);
         Mockito.when(mockSocket.sendAndReceive(Mockito.any(byte[].class), Mockito.anyString())).thenReturn(response);
         BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);
-        model2.setSocket(mockSocket);
-        model2.setNetworkTrafficObserver(trafficObserver);
+        setMocksForTesting(model2);
         model2.getStatusFromDevice();
 
-        verify(trafficObserver).onBytesSent(byteCaptor.capture());
+        verify(trafficObserver).onCommandSent(commandCaptor.capture());
+        assertEquals(0x6a, commandCaptor.getValue().byteValue());
 
-        byte[] sentBytes = byteCaptor.getValue();
-        assertEquals(17, sentBytes.length);
+        verify(trafficObserver).onBytesSent(byteArrayCaptor.capture());
 
-        assertEquals(0x6a, sentBytes[0]);
-        assertEquals(0x01, sentBytes[1]);
+        byte[] sentBytes = byteArrayCaptor.getValue();
+        assertEquals(16, sentBytes.length);
+        assertEquals(0x01, sentBytes[0]);
     }
 
     @Test
@@ -200,8 +177,7 @@ public class BroadlinkSocketModel2HandlerTest {
         };
         Mockito.when(mockSocket.sendAndReceive(Mockito.any(byte[].class), Mockito.anyString())).thenReturn(response);
         BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);
-        model2.setSocket(mockSocket);
-        model2.setCallback(mockCallback);
+        setMocksForTesting(model2);
 
         model2.getStatusFromDevice();
 

@@ -184,10 +184,8 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         );
 
         if (networkTrafficObserver != null) {
-            byte[] allBytes = new byte[ payload.length + 1];
-            allBytes[0] = command;
-            System.arraycopy(payload, 0, allBytes, 1, payload.length);
-            networkTrafficObserver.onBytesSent(allBytes);
+            networkTrafficObserver.onCommandSent(command);
+            networkTrafficObserver.onBytesSent(payload);
         }
 
         return BroadlinkProtocol.buildMessage(

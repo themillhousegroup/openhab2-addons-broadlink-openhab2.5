@@ -21,7 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Remote blaster handler
+ * Remote blaster handler, "generation" 4
  *
  * @author John Marshall/Cato Sognen - Initial contribution
  */
@@ -41,13 +41,18 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
             // These devices use a 2-byte preamble to the normal protocol;
             // https://github.com/mjg59/python-broadlink/blob/0bd58c6f598fe7239246ad9d61508febea625423/broadlink/__init__.py#L666
 
-            byte payload[] = new byte[18];
-            payload[0] = 1;
+            byte payload[] = new byte[16];
+            payload[0] = 0x04;
+            payload[1] = 0x00;
+            payload[2] = 0x24; // Status check is now Ox24, not 0x01 as in earlier devices
             byte message[] = buildMessage((byte) 0x6a, payload);
             byte response[] = sendAndReceiveDatagram(message, "RM4 device status");
             byte decodedPayload[] = decodeDevicePacket(response);
-            float temperature = (float)((double)(decodedPayload[4] * 10 + decodedPayload[5]) / 10D);
+            // Temps and humidity get divided by 100 now, not 10
+            float temperature = (float)((double)(decodedPayload[4] * 100 + decodedPayload[5]) / 100D);
             updateState("temperature", new DecimalType(temperature));
+            float humidity = (float)((double)(decodedPayload[6] * 100 + decodedPayload[7]) / 100D);
+            updateState("humidity", new DecimalType(humidity));
             return true;
         } catch (Exception e) {
             thingLogger.logError("Could not get status: ", e);
@@ -70,8 +75,10 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
         } catch (IOException e) {
             thingLogger.logError("Exception while sending code", e);
         }
+        // Have a suspicion this is now wrong due to 6-byte header.
+        // Couldn't we just pad with zeroes to the next 16-byte boundary?
         if (outputStream.size() % 16 == 0) {
-            sendAndReceiveDatagram(buildMessage((byte) 106, outputStream.toByteArray()), "remote code");
+            sendAndReceiveDatagram(buildMessage((byte) 0x6a, outputStream.toByteArray()), "remote code");
         } else {
             thingLogger.logError(
                     "Will not send remote code because it has an incorrect length (" + outputStream.size() + ")");
