@@ -14,6 +14,7 @@ package org.openhab.binding.broadlink.handler;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.io.NetworkTrafficListener;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -26,6 +27,7 @@ import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
 import org.openhab.binding.broadlink.internal.*;
 import org.openhab.binding.broadlink.internal.discovery.DeviceRediscoveryAgent;
 import org.openhab.binding.broadlink.internal.discovery.DeviceRediscoveryListener;
+import org.openhab.binding.broadlink.internal.socket.NetworkTrafficObserver;
 import org.openhab.binding.broadlink.internal.socket.RetryableSocket;
 import org.slf4j.Logger;
 
@@ -47,6 +49,10 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
 
     @Nullable
     private RetryableSocket socket;
+
+    @Nullable // Can be injected for test purposes
+    private NetworkTrafficObserver networkTrafficObserver;
+
     private int count;
 
     protected BroadlinkDeviceConfiguration thingConfig;
@@ -62,7 +68,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     public BroadlinkBaseThingHandler(Thing thing, Logger logger) {
         super(thing);
         this.thingLogger = new ThingLogger(thing, logger);
-        this.thingConfig = (BroadlinkDeviceConfiguration) getConfigAs(BroadlinkDeviceConfiguration.class);
+        this.thingConfig = getConfigAs(BroadlinkDeviceConfiguration.class);
         count = (new Random()).nextInt(65535);
 
         thingLogger.logInfo(
@@ -77,6 +83,14 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         this.socket = new RetryableSocket(thingConfig, thingLogger);
     }
 
+    // For test purposes
+    void setSocket(RetryableSocket socket) {
+        this.socket = socket;
+    }
+
+    void setNetworkTrafficObserver(NetworkTrafficObserver networkTrafficObserver) {
+        this.networkTrafficObserver = networkTrafficObserver;
+    }
 
     private boolean hasAuthenticated() {
         return authenticated;
@@ -168,6 +182,14 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             HexUtils.bytesToHex(deviceId),
             HexUtils.bytesToHex(deviceKey)
         );
+
+        if (networkTrafficObserver != null) {
+            byte[] allBytes = new byte[ payload.length + 1];
+            allBytes[0] = command;
+            System.arraycopy(payload, 0, allBytes, 1, payload.length);
+            networkTrafficObserver.onBytesSent(allBytes);
+        }
+
         return BroadlinkProtocol.buildMessage(
             command,
             payload,
@@ -181,11 +203,16 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     protected byte[] decodeDevicePacket(byte[] responseBytes) throws IOException {
-        return BroadlinkProtocol.decodePacket(
+        byte[] rxBytes = BroadlinkProtocol.decodePacket(
             responseBytes,
             this.deviceKey,
             thingConfig.getIV()
         );
+
+        if (networkTrafficObserver != null) {
+            networkTrafficObserver.onBytesReceived(rxBytes);
+        }
+        return rxBytes;
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {

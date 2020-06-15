@@ -12,14 +12,68 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import org.eclipse.smarthome.config.core.Configuration;
+import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.Thing;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerCallback;
+import org.eclipse.smarthome.core.thing.internal.ThingImpl;
+import org.eclipse.smarthome.core.thing.type.ThingType;
+import org.eclipse.smarthome.core.types.State;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import static org.mockito.Mockito.*;
+
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.openhab.binding.broadlink.BroadlinkBindingConstants;
+import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
+import org.openhab.binding.broadlink.internal.socket.NetworkTrafficObserver;
+import org.openhab.binding.broadlink.internal.socket.RetryableSocket;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.openhab.binding.broadlink.handler.BroadlinkSocketModel2Handler.*;
 
 
 public class BroadlinkSocketModel2HandlerTest {
+
+    private ThingImpl thing;
+
+    private Map<String, Object> properties;
+    private Configuration config;
+
+    @Mock
+    private RetryableSocket mockSocket;
+
+    @Mock
+    private NetworkTrafficObserver trafficObserver;
+
+    @Mock
+    private ThingHandlerCallback mockCallback;
+
+    @Mock
+    private Configuration mockConfiguration;
+
+    @Before
+    public void setUp() {
+        properties = new HashMap<>();
+        properties.put("authorizationKey", "097628343fe99e23765c1513accf8b02");
+        properties.put("mac", "AB:CD:AB:CD:AB:CD");
+        properties.put("iv", "562e17996d093d28ddb3ba695a2e6f58");
+        config = new Configuration(properties);
+        MockitoAnnotations.initMocks(this);
+        ThingTypeUID thingTypeUID = BroadlinkBindingConstants.THING_TYPE_RM2;
+        thing = new ThingImpl(thingTypeUID, "rm2-test");
+        thing.setConfiguration(config);
+    }
+
     @Test
     public void mergeOnOffBitsAllZero() {
         int result = mergeOnOffBits(OnOffType.OFF, OnOffType.OFF);
@@ -90,4 +144,78 @@ public class BroadlinkSocketModel2HandlerTest {
         assertEquals(OnOffType.ON, result);
     }
 
+    @Test
+    public void sendsExpectedBytesWhenGettingDeviceStatus() {
+        byte[] response = {
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        };
+        ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
+        Mockito.when(mockSocket.sendAndReceive(Mockito.any(byte[].class), Mockito.anyString())).thenReturn(response);
+        BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);
+        model2.setSocket(mockSocket);
+        model2.setNetworkTrafficObserver(trafficObserver);
+        model2.getStatusFromDevice();
+
+        verify(trafficObserver).onBytesSent(byteCaptor.capture());
+
+        byte[] sentBytes = byteCaptor.getValue();
+        assertEquals(17, sentBytes.length);
+
+        assertEquals(0x6a, sentBytes[0]);
+        assertEquals(0x01, sentBytes[1]);
+    }
+
+    @Test
+    public void setsTheTemperatureChannelAfterGettingStatus() {
+        byte[] response = {
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x03, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        };
+        Mockito.when(mockSocket.sendAndReceive(Mockito.any(byte[].class), Mockito.anyString())).thenReturn(response);
+        BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);
+        model2.setSocket(mockSocket);
+        model2.setCallback(mockCallback);
+
+        model2.getStatusFromDevice();
+
+        ArgumentCaptor<ChannelUID> channelCaptor = ArgumentCaptor.forClass(ChannelUID.class);
+        ArgumentCaptor<State> stateCaptor = ArgumentCaptor.forClass(State.class);
+        verify(mockCallback).stateUpdated(channelCaptor.capture(), stateCaptor.capture());
+
+        ChannelUID expectedTemperatureChannel = new ChannelUID(
+                thing.getUID(),
+                "temperature");
+        assertEquals(expectedTemperatureChannel, channelCaptor.getValue());
+
+        DecimalType expectedTemperature = new DecimalType(106.0);
+        assertEquals(expectedTemperature, stateCaptor.getValue());
+
+    }
 }

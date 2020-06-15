@@ -767,6 +767,8 @@
 		<description>The Broadlink RM 4 is an IR transmitter with Wi-Fi connectivity.</description>
 		<channels>
 			<channel id="command" typeId="command" />
+			<channel id="temperature" typeId="temperature" />
+			<channel id="humidity" typeId="humidity" />
 		</channels>
 		<config-description>
 			<parameter name="ipAddress" type="text">

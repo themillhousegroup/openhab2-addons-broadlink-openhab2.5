@@ -38,9 +38,12 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
 
     protected boolean getStatusFromDevice() {
         try {
-            byte payload[] = new byte[16];
+            // These devices use a 2-byte preamble to the normal protocol;
+            // https://github.com/mjg59/python-broadlink/blob/0bd58c6f598fe7239246ad9d61508febea625423/broadlink/__init__.py#L666
+
+            byte payload[] = new byte[18];
             payload[0] = 1;
-            byte message[] = buildMessage((byte)106, payload);
+            byte message[] = buildMessage((byte) 0x6a, payload);
             byte response[] = sendAndReceiveDatagram(message, "RM4 device status");
             byte decodedPayload[] = decodeDevicePacket(response);
             float temperature = (float)((double)(decodedPayload[4] * 10 + decodedPayload[5]) / 10D);

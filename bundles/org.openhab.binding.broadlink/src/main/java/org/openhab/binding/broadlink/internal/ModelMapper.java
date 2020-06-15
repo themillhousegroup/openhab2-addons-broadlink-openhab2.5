@@ -30,7 +30,7 @@ public class ModelMapper {
     private static final StringType UNKNOWN = new StringType("UNKNOWN");
     private static final Logger logger = LoggerFactory.getLogger(ModelMapper.class);
 
-
+    // TODO: Envies the BroadlinkHandlerFactory
     public static ThingTypeUID getThingType(int model) {
         if (model == 0)
             return BroadlinkBindingConstants.THING_TYPE_SP1;
