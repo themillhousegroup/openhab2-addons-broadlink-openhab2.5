@@ -59,6 +59,19 @@ public class Utils {
         }
     }
 
+    public static byte[] padTo(byte[] source, int quotient) {
+        int modulo = source.length % quotient;
+        if (modulo == 0) {
+            return source;
+        }
+
+        int requiredNewSize = source.length + (quotient - modulo);
+        byte[] padded = new byte[requiredNewSize];
+        System.arraycopy(source, 0, padded, 0, source.length);
+
+        return padded;
+    }
+
     public static byte[] encrypt(byte key[], IvParameterSpec ivSpec, byte data[]) throws IOException {
         SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
         try {

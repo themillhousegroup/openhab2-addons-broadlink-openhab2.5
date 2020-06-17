@@ -15,6 +15,7 @@ package org.openhab.binding.broadlink.handler;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.thing.Thing;
+import org.openhab.binding.broadlink.internal.Utils;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -60,29 +61,26 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
         }
     }
 
-    protected void sendCode(byte code[]) throws IOException {
+    protected void sendCode(byte code[]) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try {
-            // These devices use a 6-byte sendCode instead of the previous 4
+            // These devices use a 6-byte sendCode preamble instead of the previous 4
             //https://github.com/mjg59/python-broadlink/blob/0.13.0/broadlink/__init__.py#L50 add RM4 list
 
-            byte[] abyte0 = new byte[6];
-            abyte0[0] = (byte) 0xd0;
-            abyte0[2] = 2;
-            outputStream.write(abyte0);
+            byte[] preamble = new byte[6];
+            preamble[0] = (byte) 0xd0;
+            preamble[2] = 2;
+            outputStream.write(preamble);
             outputStream.write(code);
+
+            byte[] padded = Utils.padTo(outputStream.toByteArray(), 16);
+            byte[] message = buildMessage((byte) 0x6a, padded);
+            sendAndReceiveDatagram(message, "remote code");
         } catch (IOException e) {
             thingLogger.logError("Exception while sending code", e);
         }
-        // Have a suspicion this is now wrong due to 6-byte header.
-        // Couldn't we just pad with zeroes to the next 16-byte boundary?
-        if (outputStream.size() % 16 == 0) {
-            sendAndReceiveDatagram(buildMessage((byte) 0x6a, outputStream.toByteArray()), "remote code");
-        } else {
-            thingLogger.logError(
-                    "Will not send remote code because it has an incorrect length (" + outputStream.size() + ")");
-        }
+
 
     }
 }

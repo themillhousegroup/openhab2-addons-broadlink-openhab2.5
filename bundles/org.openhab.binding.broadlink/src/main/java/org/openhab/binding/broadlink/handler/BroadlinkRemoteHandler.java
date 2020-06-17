@@ -50,24 +50,20 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
         super(thing, logger);
     }
 
-    protected void sendCode(byte code[]) throws IOException {
+    protected void sendCode(byte code[]) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try {
-            byte[] abyte0 = new byte[4];
-            abyte0[0] = 2;
-            outputStream.write(abyte0);
+            byte[] preamble = new byte[4];
+            preamble[0] = 2;
+            outputStream.write(preamble);
             outputStream.write(code);
+            byte[] padded = Utils.padTo(outputStream.toByteArray(), 16);
+            byte[] message = buildMessage((byte) 0x6a, padded);
+            sendAndReceiveDatagram(message, "remote code");
         } catch (IOException e) {
             thingLogger.logError("Exception while sending code", e);
         }
-        if (outputStream.size() % 16 == 0) {
-            sendAndReceiveDatagram(buildMessage((byte) 106, outputStream.toByteArray()), "remote code");
-        } else {
-            thingLogger.logError(
-                    "Will not send remote code because it has an incorrect length (" + outputStream.size() + ")");
-        }
-
     }
 
     public void handleCommand(ChannelUID channelUID, Command command) {
@@ -90,25 +86,21 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
             return;
         }
         String s;
-        try {
-            switch ((s = channelTypeUID.getId()).hashCode()) {
-            case 950394699: // FIXME WTF?!?!
-                if (s.equals("command")) {
-                    thingLogger.logDebug("Handling ir/rf command {} on channel {} of thing {}",
-                            new Object[] { command, channelUID.getId(), getThing().getLabel() });
-                    byte code[] = lookupCode(command, channelUID);
-                    if (code != null)
-                        sendCode(code);
-                    break;
-                }
-                // fall through
-
-            default:
-                thingLogger.logDebug("Thing " + getThing().getLabel() + " has unknown channel type " + channelTypeUID.getId());
+        switch ((s = channelTypeUID.getId()).hashCode()) {
+        case 950394699: // FIXME WTF?!?!
+            if (s.equals("command")) {
+                thingLogger.logDebug("Handling ir/rf command {} on channel {} of thing {}",
+                        new Object[] { command, channelUID.getId(), getThing().getLabel() });
+                byte code[] = lookupCode(command, channelUID);
+                if (code != null)
+                    sendCode(code);
                 break;
             }
-        } catch (IOException e) {
-            thingLogger.logError("Exception while trying to send code", e);
+            // fall through
+
+        default:
+            thingLogger.logDebug("Thing " + getThing().getLabel() + " has unknown channel type " + channelTypeUID.getId());
+            break;
         }
     }
 

@@ -12,33 +12,21 @@
  */
 package org.openhab.binding.broadlink.handler;
 
-import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
-import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.eclipse.smarthome.core.thing.binding.ThingHandlerCallback;
-import org.eclipse.smarthome.core.thing.internal.ThingImpl;
-import org.eclipse.smarthome.core.thing.type.ThingType;
 import org.eclipse.smarthome.core.types.State;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import static org.mockito.Mockito.*;
-
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openhab.binding.broadlink.BroadlinkBindingConstants;
-import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
-import org.openhab.binding.broadlink.internal.socket.NetworkTrafficObserver;
-import org.openhab.binding.broadlink.internal.socket.RetryableSocket;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.openhab.binding.broadlink.handler.BroadlinkSocketModel2Handler.*;
 
 
@@ -48,6 +36,7 @@ public class BroadlinkRemoteModel2HandlerTest extends AbstractBroadlinkThingHand
     public void setUp() {
         configureUnderlyingThing(BroadlinkBindingConstants.THING_TYPE_RM2, "rm2-test");
         MockitoAnnotations.initMocks(this);
+        Mockito.when(mockSocket.sendAndReceive(Mockito.any(byte[].class), Mockito.anyString())).thenReturn(response);
     }
 
     @Test
@@ -120,28 +109,29 @@ public class BroadlinkRemoteModel2HandlerTest extends AbstractBroadlinkThingHand
         assertEquals(OnOffType.ON, result);
     }
 
+    private byte[] response = {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+
     @Test
     public void sendsExpectedBytesWhenGettingDeviceStatus() {
-        byte[] response = {
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        };
+
         ArgumentCaptor<Byte> commandCaptor = ArgumentCaptor.forClass(Byte.class);
         ArgumentCaptor<byte[]> byteArrayCaptor = ArgumentCaptor.forClass(byte[].class);
-        Mockito.when(mockSocket.sendAndReceive(Mockito.any(byte[].class), Mockito.anyString())).thenReturn(response);
         BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);
         setMocksForTesting(model2);
         model2.getStatusFromDevice();
@@ -193,5 +183,79 @@ public class BroadlinkRemoteModel2HandlerTest extends AbstractBroadlinkThingHand
         DecimalType expectedTemperature = new DecimalType(106.0);
         assertEquals(expectedTemperature, stateCaptor.getValue());
 
+    }
+
+    @Test
+    public void sendsExpectedBytesWhenSendingCode() throws IOException {
+        ArgumentCaptor<Byte> commandCaptor = ArgumentCaptor.forClass(Byte.class);
+        ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
+        BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);
+        setMocksForTesting(model2);
+        // Note the length is 12 so as to not require padding
+        byte[] code = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a };
+        model2.sendCode(code);
+
+        verify(trafficObserver).onCommandSent(commandCaptor.capture());
+        assertEquals(0x6a, commandCaptor.getValue().byteValue());
+
+        verify(trafficObserver).onBytesSent(byteCaptor.capture());
+
+        byte[] sentBytes = byteCaptor.getValue();
+        assertEquals(16, sentBytes.length);
+
+        assertEquals(0x02, sentBytes[0]); // 0x00, 0x00, 0x00
+
+        assertEquals(0x01, sentBytes[4]);
+        assertEquals(0x02, sentBytes[5]);
+        assertEquals(0x03, sentBytes[6]);
+        assertEquals(0x04, sentBytes[7]);
+        assertEquals(0x05, sentBytes[8]);
+        assertEquals(0x06, sentBytes[9]);
+        assertEquals(0x07, sentBytes[10]);
+        assertEquals(0x08, sentBytes[11]);
+        assertEquals(0x09, sentBytes[12]);
+        assertEquals(0x0a, sentBytes[13]);
+    }
+
+
+    @Test
+    public void sendsExpectedBytesWhenSendingCodeIncludingPadding() throws IOException {
+        ArgumentCaptor<Byte> commandCaptor = ArgumentCaptor.forClass(Byte.class);
+        ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
+        BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);
+        setMocksForTesting(model2);
+        // Note the length is such that padding up to the next multiple of 16 will be needed
+        byte[] code = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11 };
+        model2.sendCode(code);
+
+        verify(trafficObserver).onCommandSent(commandCaptor.capture());
+        assertEquals(0x6a, commandCaptor.getValue().byteValue());
+
+        verify(trafficObserver).onBytesSent(byteCaptor.capture());
+
+        byte[] sentBytes = byteCaptor.getValue();
+        assertEquals(32, sentBytes.length);
+
+        assertEquals(0x02, sentBytes[0]); // 0x00, 0x00, 0x00
+
+        assertEquals(0x01, sentBytes[4]);
+        assertEquals(0x02, sentBytes[5]);
+        assertEquals(0x03, sentBytes[6]);
+        assertEquals(0x04, sentBytes[7]);
+        assertEquals(0x05, sentBytes[8]);
+        assertEquals(0x06, sentBytes[9]);
+        assertEquals(0x07, sentBytes[10]);
+        assertEquals(0x08, sentBytes[11]);
+        assertEquals(0x09, sentBytes[12]);
+        assertEquals(0x0a, sentBytes[13]);
+        assertEquals(0x0b, sentBytes[14]);
+        assertEquals(0x0c, sentBytes[15]);
+        assertEquals(0x0d, sentBytes[16]);
+        assertEquals(0x0e, sentBytes[17]);
+        assertEquals(0x0f, sentBytes[18]);
+        assertEquals(0x10, sentBytes[19]);
+        assertEquals(0x11, sentBytes[20]);
+        assertEquals(0x00, sentBytes[21]);
+        assertEquals(0x00, sentBytes[31]);
     }
 }
