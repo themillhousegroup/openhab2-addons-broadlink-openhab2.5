@@ -64,8 +64,8 @@ public class ModelMapper {
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM Mini 3, firmware v44057 - treated as an RM4 due to sendCode quirk
         if (model == 0x51da)
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4b
-        if (model == 0x610f || model == 0x62be)
-            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4c
+        if (model >= 0x610f && model <= 0x62bf)
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4c - wide range of identifiers exist
         if (model == 0x610e)
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Mini
         if (model == 0x61a2)

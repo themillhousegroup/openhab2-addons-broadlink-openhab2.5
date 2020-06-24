@@ -119,6 +119,8 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     public void thingUpdated(Thing thing) {
         thingLogger.logDebug("thingUpdated");
         forceOffline(ThingStatusDetail.CONFIGURATION_PENDING, "Thing has been updated, will reconnect soon");
+        // Refetch the config NOW before we come back up again...
+        this.thingConfig = getConfigAs(BroadlinkDeviceConfiguration.class);
     }
 
     public void dispose() {
