@@ -64,6 +64,8 @@ public class ModelMapper {
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM Mini 3, firmware v44057 - treated as an RM4 due to sendCode quirk
         if (model == 0x51da)
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4b
+        if (model >= 0x6020 && model <= 0x602f)
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Pro - wide range of identifiers exist
         if (model >= 0x610f && model <= 0x62bf)
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4c - wide range of identifiers exist
         if (model == 0x610e)
@@ -108,9 +110,10 @@ public class ModelMapper {
 //            return BroadlinkBindingConstants.THING_TYPE_S1C;
 //        if (model == 0x4e4d)
 //            return null;
-        logger.error("Device identifying itself as '{}' is not currently supported. Please report this to the developer!", model);
+        String modelAsHexString = Integer.toHexString(model);
+        logger.error("Device identifying itself as '{}' (0x{}) is not currently supported. Please report this to the developer!", model, modelAsHexString);
         logger.error("Join the discussion at https://community.openhab.org/t/broadlink-binding-for-rmx-a1-spx-and-mp-any-interest/22768/616");
-        throw new UnsupportedOperationException("Device identifying itself as '" + model + "' is not currently supported. Please report this to the developer!");
+        throw new UnsupportedOperationException("Device identifying itself as '" + model + "' (hex 0x" + modelAsHexString + ") is not currently supported. Please report this to the developer!");
     }
 
     private static StringType lookup(StringType[] values, byte b) {

@@ -66,13 +66,28 @@ public class ModelMapperTest {
     }
 
     @Test
+    public void mapsRm4_6026_AsRm4() {
+        assertEquals(
+                BroadlinkBindingConstants.THING_TYPE_RM4,
+                ModelMapper.getThingType(0x6026)
+        );
+    }
+    @Test
+    public void mapsRm4_24846_AsRm4() {
+        assertEquals(
+                BroadlinkBindingConstants.THING_TYPE_RM4,
+                ModelMapper.getThingType(24846)
+        );
+    }
+
+    @Test
     public void throwsOnUnrecognisedDeviceModel() {
         try {
             ModelMapper.getThingType(0x6666);
             Assert.fail("Should have thrown on unmapped device model");
         } catch (Exception e) {
             assertEquals(
-        "Device identifying itself as '26214' is not currently supported. Please report this to the developer!",
+        "Device identifying itself as '26214' (hex 0x6666) is not currently supported. Please report this to the developer!",
                 e.getMessage()
             );
         }
