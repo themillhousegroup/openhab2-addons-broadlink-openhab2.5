@@ -199,7 +199,7 @@ public class BroadlinkRemoteModel4HandlerTest extends AbstractBroadlinkThingHand
                 "temperature");
         assertEquals(expectedTemperatureChannel, channelCaptures.get(0));
 
-        DecimalType expectedTemperature = new DecimalType(-39.709999084472656D);
+        DecimalType expectedTemperature = new DecimalType(84.16999816894531D);
         assertEquals(expectedTemperature, stateCaptures.get(0));
 
         ChannelUID expectedHumidityChannel = new ChannelUID(
@@ -207,7 +207,7 @@ public class BroadlinkRemoteModel4HandlerTest extends AbstractBroadlinkThingHand
                 "humidity");
         assertEquals(expectedHumidityChannel, channelCaptures.get(1));
 
-        DecimalType expectedHumidity = new DecimalType(84.16999816894531D);
+        DecimalType expectedHumidity = new DecimalType(-85.8499984741211D);
         assertEquals(expectedHumidity, stateCaptures.get(1));
     }
 }

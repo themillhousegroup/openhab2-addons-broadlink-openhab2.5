@@ -50,9 +50,11 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
             byte response[] = sendAndReceiveDatagram(message, "RM4 device status");
             byte decodedPayload[] = decodeDevicePacket(response);
             // Temps and humidity get divided by 100 now, not 10
-            float temperature = (float)((double)(decodedPayload[4] * 100 + decodedPayload[5]) / 100D);
+            // Temperature and Humidity response fields are 2 bytes further into the response,
+            // mirroring the request
+            float temperature = (float)((double)(decodedPayload[6] * 100 + decodedPayload[7]) / 100D);
             updateState("temperature", new DecimalType(temperature));
-            float humidity = (float)((double)(decodedPayload[6] * 100 + decodedPayload[7]) / 100D);
+            float humidity = (float)((double)(decodedPayload[8] * 100 + decodedPayload[8]) / 100D);
             updateState("humidity", new DecimalType(humidity));
             return true;
         } catch (Exception e) {
