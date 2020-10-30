@@ -35,9 +35,9 @@ public class ModelMapperTest {
     }
 
     @Test
-    public void mapsRm35f36AsRm4() {
+    public void mapsRm35f36AsRm3Q() {
         assertEquals(
-            BroadlinkBindingConstants.THING_TYPE_RM4,
+            BroadlinkBindingConstants.THING_TYPE_RM3Q,
             ModelMapper.getThingType(0x5f36)
         );
     }
