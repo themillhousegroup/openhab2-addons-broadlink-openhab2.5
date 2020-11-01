@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.Thing;
 
 /**
@@ -19,15 +20,14 @@ import org.eclipse.smarthome.core.thing.Thing;
  * 
  * @author Stewart Cossey - Initial contribution
  */
+@NonNullByDefault
 public class BroadlinkRemoteModel3V44057Handler extends BroadlinkRemoteModel4Handler {
 
-	public BroadlinkRemoteModel3V44057Handler(Thing thing) {
+    public BroadlinkRemoteModel3V44057Handler(Thing thing) {
         super(thing);
     }
     
     protected boolean getStatusFromDevice() {
         return true;
     }
-
-
 }

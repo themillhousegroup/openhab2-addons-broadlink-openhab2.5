@@ -17,6 +17,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
+/**
+ * Tests the generic utilty functions.
+ * 
+ * @author John Marshall/Cato Sognen - Initial contribution
+ */
+@NonNullByDefault
 public class UtilsTest {
     @Test
     public void padToDoesNothingOnQuotientSizedBuffer() {

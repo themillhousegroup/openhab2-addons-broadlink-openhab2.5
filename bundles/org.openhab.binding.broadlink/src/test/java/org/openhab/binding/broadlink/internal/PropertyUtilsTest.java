@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.broadlink.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -19,6 +20,12 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests property utility functions.
+ * 
+ * @author John Marshall/Cato Sognen - Initial contribution
+ */
+@NonNullByDefault
 public class PropertyUtilsTest {
     @Test
     public void isPropertyEmptyTrueForEmptyMap() {

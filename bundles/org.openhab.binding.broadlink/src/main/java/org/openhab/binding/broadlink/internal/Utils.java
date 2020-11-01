@@ -31,7 +31,7 @@ import java.io.IOException;
 @NonNullByDefault
 public class Utils {
 
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     public static boolean isOnline(Thing thing) {
         return thing.getStatus().equals(ThingStatus.ONLINE);
@@ -79,7 +79,7 @@ public class Utils {
             cipher.init(1, secretKey, ivSpec);
             return cipher.doFinal(data);
         } catch (Exception e) {
-            logger.error("Exception while encrypting", e);
+            LOGGER.error("Exception while encrypting", e);
             throw new IOException(e);
         }
     }
@@ -91,7 +91,7 @@ public class Utils {
             cipher.init(2, secretKey, ivSpec);
             return cipher.doFinal(data);
         } catch (Exception e) {
-            logger.error("Exception while decrypting", e);
+            LOGGER.error("Exception while decrypting", e);
             throw new IOException(e);
         }
     }

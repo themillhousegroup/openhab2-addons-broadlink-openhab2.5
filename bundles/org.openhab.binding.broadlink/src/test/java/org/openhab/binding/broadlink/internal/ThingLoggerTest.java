@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.broadlink.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingUID;
@@ -29,6 +30,12 @@ import static org.junit.Assert.*;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests thing logger object.
+ * 
+ * @author John Marshall/Cato Sognen - Initial contribution
+ */
+@NonNullByDefault
 public class ThingLoggerTest {
 
     private Thing mockThing = Mockito.mock(Thing.class);

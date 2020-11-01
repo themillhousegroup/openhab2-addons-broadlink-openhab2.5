@@ -72,7 +72,7 @@ public class BroadlinkStripModel11K3S2UHandler extends BroadlinkBaseThingHandler
     }
 
     private void setStatusOnDevice(byte sid, byte state) throws IOException {
-        int sid_mask = 1 << sid - 1;
+        int sidMask = 1 << sid - 1;
         byte payload[] = new byte[16];
         payload[0] = 13;
         payload[2] = -91;
@@ -80,15 +80,15 @@ public class BroadlinkStripModel11K3S2UHandler extends BroadlinkBaseThingHandler
         payload[4] = 90;
         payload[5] = 90;
         if (state == 1)
-            payload[6] = (byte) (178 + (sid_mask << 1));
+            payload[6] = (byte) (178 + (sidMask << 1));
         else
-            payload[6] = (byte) (byte) (178 + sid_mask);
+            payload[6] = (byte) (byte) (178 + sidMask);
         payload[7] = -64;
         payload[8] = 2;
         payload[10] = 3;
-        payload[13] = (byte) sid_mask;
+        payload[13] = (byte) sidMask;
         if (state == 1)
-            payload[14] = (byte) sid_mask;
+            payload[14] = (byte) sidMask;
         else
             payload[14] = 0;
         byte message[] = buildMessage((byte) 106, payload);
