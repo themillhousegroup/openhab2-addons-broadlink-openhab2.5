@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class ModelMapper {
 
     private static final StringType UNKNOWN = new StringType("UNKNOWN");
-    private static final Logger logger = LoggerFactory.getLogger(ModelMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelMapper.class);
 
     // TODO: Envies the BroadlinkHandlerFactory
     public static ThingTypeUID getThingType(int model) {
@@ -111,8 +111,8 @@ public class ModelMapper {
 //        if (model == 0x4e4d)
 //            return null;
         String modelAsHexString = Integer.toHexString(model);
-        logger.error("Device identifying itself as '{}' (0x{}) is not currently supported. Please report this to the developer!", model, modelAsHexString);
-        logger.error("Join the discussion at https://community.openhab.org/t/broadlink-binding-for-rmx-a1-spx-and-mp-any-interest/22768/616");
+        LOGGER.error("Device identifying itself as '{}' (0x{}) is not currently supported. Please report this to the developer!", model, modelAsHexString);
+        LOGGER.error("Join the discussion at https://community.openhab.org/t/broadlink-binding-for-rmx-a1-spx-and-mp-any-interest/22768/616");
         throw new UnsupportedOperationException("Device identifying itself as '" + model + "' (hex 0x" + modelAsHexString + ") is not currently supported. Please report this to the developer!");
     }
 
@@ -125,7 +125,7 @@ public class ModelMapper {
         }
     }
 
-    private static final StringType[] airValues = {
+    private static final StringType[] AIR_VALUES = {
             new StringType("PERFECT"),
             new StringType("GOOD"),
             new StringType("NORMAL"),
@@ -133,10 +133,10 @@ public class ModelMapper {
     };
 
     public static StringType getAirValue(byte b) {
-        return lookup(airValues, b);
+        return lookup(AIR_VALUES, b);
     }
 
-    private static final StringType[] lightValues = {
+    private static final StringType[] LIGHT_VALUES = {
             new StringType("DARK"),
             new StringType("DIM"),
             new StringType("NORMAL"),
@@ -144,10 +144,10 @@ public class ModelMapper {
     };
 
     public static StringType getLightValue(byte b) {
-        return lookup(lightValues, b);
+        return lookup(LIGHT_VALUES, b);
     }
 
-    private static final StringType[] noiseValues = {
+    private static final StringType[] NOISE_VALUES = {
             new StringType("QUIET"),
             new StringType("NORMAL"),
             new StringType("NOISY"),
@@ -155,6 +155,6 @@ public class ModelMapper {
     };
 
     public static StringType getNoiseValue(byte b) {
-        return lookup(noiseValues, b);
+        return lookup(NOISE_VALUES, b);
     }
 }

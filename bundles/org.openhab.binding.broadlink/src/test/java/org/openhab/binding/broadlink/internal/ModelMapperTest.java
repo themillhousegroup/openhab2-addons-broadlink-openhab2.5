@@ -18,6 +18,14 @@ import org.openhab.binding.broadlink.BroadlinkBindingConstants;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
+/**
+ * Tests that each Thing Type maps to the right model number.
+ * 
+ * @author John Marshall/Cato Sognen - Initial contribution
+ */
+@NonNullByDefault
 public class ModelMapperTest {
     @Test
     public void mapsSpMini2ASp2() {
@@ -66,14 +74,14 @@ public class ModelMapperTest {
     }
 
     @Test
-    public void mapsRm4_6026_AsRm4() {
+    public void mapsRm4Model6026AsRm4() {
         assertEquals(
                 BroadlinkBindingConstants.THING_TYPE_RM4,
                 ModelMapper.getThingType(0x6026)
         );
     }
     @Test
-    public void mapsRm4_24846_AsRm4() {
+    public void mapsRm4Model24846AsRm4() {
         assertEquals(
                 BroadlinkBindingConstants.THING_TYPE_RM4,
                 ModelMapper.getThingType(24846)

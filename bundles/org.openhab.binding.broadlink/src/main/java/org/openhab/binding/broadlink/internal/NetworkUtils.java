@@ -30,18 +30,18 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class NetworkUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(NetworkUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkUtils.class);
 
     public static boolean hostAvailabilityCheck(@Nullable String host, int timeout) {
         if (host == null) {
-            logger.warn("Can't check availability of a null host");
+            LOGGER.warn("Can't check availability of a null host");
             return false;
         }
         try {
             InetAddress address = InetAddress.getByName(host);
             return address.isReachable(timeout);
         } catch (Exception e) {
-            logger.error("Exception while trying to determine reachability of {}", host, e);
+            LOGGER.error("Exception while trying to determine reachability of {}", host, e);
         }
         return false;
     }
@@ -68,7 +68,6 @@ public class NetworkUtils {
 
     public static InetAddress getLocalHostLANAddress()
             throws UnknownHostException {
-
         try {
             InetAddress candidateAddress = findNonLoopbackAddress();
 

@@ -12,35 +12,30 @@
  */
 package org.openhab.binding.broadlink.handler;
 
-import org.eclipse.smarthome.config.core.Configuration;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.DecimalType;
-import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.eclipse.smarthome.core.thing.binding.ThingHandlerCallback;
-import org.eclipse.smarthome.core.thing.internal.ThingImpl;
 import org.eclipse.smarthome.core.types.State;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openhab.binding.broadlink.BroadlinkBindingConstants;
-import org.openhab.binding.broadlink.internal.socket.NetworkTrafficObserver;
-import org.openhab.binding.broadlink.internal.socket.RetryableSocket;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.openhab.binding.broadlink.handler.BroadlinkSocketModel2Handler.*;
 
-
+/**
+ * Tests the Remote Model 4 handler.
+ * 
+ * @author John Marshall/Cato Sognen - Initial contribution
+ */
+@NonNullByDefault
 public class BroadlinkRemoteModel4HandlerTest extends AbstractBroadlinkThingHandlerTest {
 
     private byte[] response = {
@@ -70,7 +65,6 @@ public class BroadlinkRemoteModel4HandlerTest extends AbstractBroadlinkThingHand
 
     @Test
     public void sendsExpectedBytesWhenGettingDeviceStatus() {
-
         ArgumentCaptor<Byte> commandCaptor = ArgumentCaptor.forClass(Byte.class);
 
         ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
@@ -125,6 +119,7 @@ public class BroadlinkRemoteModel4HandlerTest extends AbstractBroadlinkThingHand
         assertEquals(0x09, sentBytes[14]);
         assertEquals(0x0a, sentBytes[15]);
     }
+
     @Test
     public void sendsExpectedBytesWhenSendingCodeIncludingPadding() throws IOException {
         ArgumentCaptor<Byte> commandCaptor = ArgumentCaptor.forClass(Byte.class);

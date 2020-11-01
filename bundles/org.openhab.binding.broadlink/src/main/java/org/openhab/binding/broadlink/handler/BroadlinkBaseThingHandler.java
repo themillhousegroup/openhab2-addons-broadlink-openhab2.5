@@ -14,7 +14,6 @@ package org.openhab.binding.broadlink.handler;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jetty.io.NetworkTrafficListener;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -166,7 +165,6 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             thingLogger.logError("Authentication failed: ", e);
             return false;
         }
-
     }
 
     protected byte @Nullable [] sendAndReceiveDatagram(byte message[], String purpose) {

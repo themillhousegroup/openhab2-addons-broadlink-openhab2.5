@@ -32,7 +32,7 @@ import java.util.TimeZone;
 @NonNullByDefault
 public class BroadlinkProtocol {
 
-    private static final Logger logger = LoggerFactory.getLogger(BroadlinkProtocol.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BroadlinkProtocol.class);
 
     public static byte[] buildMessage(byte command, byte[] payload, int count, byte[] mac, byte[] deviceId, byte[] iv,
         byte[] key, int deviceType) {     
@@ -80,7 +80,7 @@ public class BroadlinkProtocol {
             outputStream.write(packet);
             outputStream.write(Utils.encrypt(key, new IvParameterSpec(iv), payload));
         } catch (IOException e) {
-            logger.error("IOException while building message", e);
+            LOGGER.error("IOException while building message", e);
             return packet;
         }
         byte data[] = outputStream.toByteArray();

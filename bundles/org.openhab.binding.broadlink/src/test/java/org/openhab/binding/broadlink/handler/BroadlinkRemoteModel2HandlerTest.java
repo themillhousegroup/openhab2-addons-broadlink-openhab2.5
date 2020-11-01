@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -29,7 +30,12 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.openhab.binding.broadlink.handler.BroadlinkSocketModel2Handler.*;
 
-
+/**
+ * Tests the Remote Model 2 handler.
+ * 
+ * @author John Marshall/Cato Sognen - Initial contribution
+ */
+@NonNullByDefault
 public class BroadlinkRemoteModel2HandlerTest extends AbstractBroadlinkThingHandlerTest {
 
     @Before
@@ -129,7 +135,6 @@ public class BroadlinkRemoteModel2HandlerTest extends AbstractBroadlinkThingHand
 
     @Test
     public void sendsExpectedBytesWhenGettingDeviceStatus() {
-
         ArgumentCaptor<Byte> commandCaptor = ArgumentCaptor.forClass(Byte.class);
         ArgumentCaptor<byte[]> byteArrayCaptor = ArgumentCaptor.forClass(byte[].class);
         BroadlinkRemoteHandler model2 = new BroadlinkRemoteModel2Handler(thing);

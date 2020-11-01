@@ -14,7 +14,6 @@ package org.openhab.binding.broadlink.internal.socket;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.core.util.HexUtils;
 import org.openhab.binding.broadlink.internal.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public class BroadlinkSocket {
     @Nullable
     private static Thread socketReceiveThread;
     private static List<BroadlinkSocketListener> listeners = new ArrayList<BroadlinkSocketListener>();
-    private static final Logger logger = LoggerFactory.getLogger(BroadlinkSocket.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BroadlinkSocket.class);
 
     static {
         buffer = new byte[1024];
@@ -95,9 +94,9 @@ public class BroadlinkSocket {
                 }
             } catch (IOException e) {
                 if (!isInterrupted())
-                    logger.error("Error while receiving", e);
+                    LOGGER.error("Error while receiving", e);
             }
-            BroadlinkSocket.logger.info("Receiver thread ended");
+            BroadlinkSocket.LOGGER.info("Receiver thread ended");
         }
 
         private ReceiverThread() {
@@ -123,7 +122,7 @@ public class BroadlinkSocket {
             try {
                 socket = new MulticastSocket();
             } catch (IOException e) {
-                logger.error("Setup socket error '{}'.", e.getMessage());
+                LOGGER.error("Setup socket error '{}'.", e.getMessage());
             }
             socketReceiveThread = new ReceiverThread();
             socketReceiveThread.start();
@@ -136,7 +135,7 @@ public class BroadlinkSocket {
                 socketReceiveThread.interrupt();
             }
             if (socket != null) {
-                logger.info("Socket closed");
+                LOGGER.info("Socket closed");
                 socket.close();
                 socket = null;
             }
@@ -152,7 +151,7 @@ public class BroadlinkSocket {
             DatagramPacket sendPacket = new DatagramPacket(message, message.length, InetAddress.getByName(host), port);
             socket.send(sendPacket);
         } catch (IOException e) {
-            logger.error("IO Error sending message: '{}'", e.getMessage());
+            LOGGER.error("IO Error sending message: '{}'", e.getMessage());
         }
     }
 }
