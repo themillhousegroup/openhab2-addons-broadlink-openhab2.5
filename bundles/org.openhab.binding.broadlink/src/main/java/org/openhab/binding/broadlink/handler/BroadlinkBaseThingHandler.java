@@ -22,6 +22,7 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.util.HexUtils;
+import org.openhab.binding.broadlink.BroadlinkBindingConstants;
 import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
 import org.openhab.binding.broadlink.internal.*;
 import org.openhab.binding.broadlink.internal.discovery.DeviceRediscoveryAgent;
@@ -72,12 +73,12 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
 
         thingLogger.logInfo(
             "constructed: resetting deviceKey to '{}', length {}",
-            thingConfig.getAuthorizationKey(),
-            thingConfig.getAuthorizationKey().length()
+            BroadlinkBindingConstants.BROADLINK_AUTH_KEY,
+            BroadlinkBindingConstants.BROADLINK_AUTH_KEY.length()
         );
         thingLogger.logInfo("(HINT: this should start '0976', end '8b02' and have length 32)");
         this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID);
-        this.deviceKey = HexUtils.hexToBytes(thingConfig.getAuthorizationKey());
+        this.deviceKey = HexUtils.hexToBytes(BroadlinkBindingConstants.BROADLINK_AUTH_KEY);
 
         this.socket = new RetryableSocket(thingConfig, thingLogger);
     }
@@ -140,7 +141,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         authenticated = false;
         // When authenticating, we must ALWAYS use the initial values
         this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID);
-        this.deviceKey = HexUtils.hexToBytes(thingConfig.getAuthorizationKey());
+        this.deviceKey = HexUtils.hexToBytes(BroadlinkBindingConstants.BROADLINK_AUTH_KEY);
 
         try {
             byte authRequest[] = buildMessage((byte) 0x65, BroadlinkProtocol.buildAuthenticationPayload(), -1);
@@ -194,7 +195,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             count,
             thingConfig.getMAC(),
             deviceId,
-            HexUtils.hexToBytes(thingConfig.getIV()),
+            HexUtils.hexToBytes(BroadlinkBindingConstants.BROADLINK_IV),
             deviceKey,
             deviceType
         );
@@ -204,7 +205,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         byte[] rxBytes = BroadlinkProtocol.decodePacket(
             responseBytes,
             this.deviceKey,
-            thingConfig.getIV()
+            BroadlinkBindingConstants.BROADLINK_IV
         );
 
         if (networkTrafficObserver != null) {
