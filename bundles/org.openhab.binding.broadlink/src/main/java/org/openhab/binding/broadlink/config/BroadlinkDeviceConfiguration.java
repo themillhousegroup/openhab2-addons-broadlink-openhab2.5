@@ -28,8 +28,6 @@ public class BroadlinkDeviceConfiguration {
     private String mac;
     private int pollingInterval;
     @Nullable private String mapFilename;
-    private String authorizationKey;
-    private String iv;
     private int retries = 1;
     private boolean ignoreFailedUpdates = false;
     private int deviceType;
@@ -39,8 +37,6 @@ public class BroadlinkDeviceConfiguration {
         mac = "";
         pollingInterval = 30;
         staticIp = true;
-        authorizationKey = "";
-        iv = "";
     }
 
     public String getIpAddress() {
@@ -102,22 +98,6 @@ public class BroadlinkDeviceConfiguration {
         this.mapFilename = mapFilename;
     }
 
-    public String getAuthorizationKey() {
-        return authorizationKey;
-    }
-
-    public void setAuthorizationKey(String authorizationKey) {
-        this.authorizationKey = authorizationKey;
-    }
-
-    public String getIV() {
-        return iv;
-    }
-
-    public void setIV(String iv) {
-        this.iv = iv;
-    }
-
     public int getDeviceType() {
         return deviceType;
     }
@@ -157,11 +137,6 @@ public class BroadlinkDeviceConfiguration {
                 .append(pollingInterval)
                 .append(", mapFilename=")
                 .append(mapFilename)
-                .append(", authorizationKey=")
-                .append(authorizationKey)
-                .append(", iv=")
-                .append(iv)
                 .append("]").toString();
     }
-
 }

@@ -161,6 +161,8 @@ public class BroadlinkBindingConstants {
     public static final int CMD_RM2_CODE_ID = 133;
     public static final int CMD_RM2_SEND_ID = 134;
     public static final int CMD_EASY_CONFIG_ID = 10000;
+    public static final String BROADLINK_AUTH_KEY = "097628343fe99e23765c1513accf8b02";
+    public static final String BROADLINK_IV = "562e17996d093d28ddb3ba695a2e6f58";
 
     public static final Map<ThingTypeUID, String> SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP = new HashMap<ThingTypeUID, String>();
 
