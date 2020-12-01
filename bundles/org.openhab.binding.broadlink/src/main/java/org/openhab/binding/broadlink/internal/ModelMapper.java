@@ -68,6 +68,8 @@ public class ModelMapper {
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Pro - wide range of identifiers exist
         if (model >= 0x610f && model <= 0x62bf)
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4c - wide range of identifiers exist
+        if (model == 0x6539)
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4c Mini
         if (model == 0x610e)
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Mini
         if (model == 0x61a2)
