@@ -22,7 +22,7 @@ import org.slf4j.Logger;
  * @author John Marshall/Cato Sognen - Initial contribution
  */
 @NonNullByDefault
-public final class ThingLogger  {
+public final class ThingLogger {
 
     private static final String STANDARD_LOG_PREFIX_WITH_MSG_FORMAT = "{}[{}]: {}";
     private static final String EXCEPTION_DUMP_PREFIX = "Broadlink Exception: ";

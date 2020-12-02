@@ -12,16 +12,16 @@
  */
 package org.openhab.binding.broadlink.internal;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.smarthome.core.thing.*;
+import java.io.IOException;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-
 
 /**
  * Utilities for working with the Broadlink devices.
@@ -46,7 +46,8 @@ public class Utils {
             throw new IllegalArgumentException("Can't slice; from: " + from + " is larger than to: " + to);
         }
         if (to - from > source.length) {
-            throw new IllegalArgumentException("Can't slice; from: " + from + " - to: " + to + " is longer than source length: " + source.length);
+            throw new IllegalArgumentException(
+                    "Can't slice; from: " + from + " - to: " + to + " is longer than source length: " + source.length);
         }
         if (to == from) {
             byte sliced[] = new byte[1];

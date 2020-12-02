@@ -12,11 +12,11 @@
  */
 package org.openhab.binding.broadlink;
 
-import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
 /**
  * The {@link BroadlinkBindingConstants} class defines common constants, which are
@@ -46,7 +46,7 @@ public class BroadlinkBindingConstants {
     public static final ThingTypeUID THING_TYPE_SP1 = new ThingTypeUID("broadlink", "sp1");
     public static final ThingTypeUID THING_TYPE_SP2 = new ThingTypeUID("broadlink", "sp2");
     public static final ThingTypeUID THING_TYPE_SP3 = new ThingTypeUID("broadlink", "sp3");
-//    public static final ThingTypeUID THING_TYPE_S1C = new ThingTypeUID("broadlink", "s1c");
+    // public static final ThingTypeUID THING_TYPE_S1C = new ThingTypeUID("broadlink", "s1c");
     public static final ThingTypeUID THING_TYPE_PIR = new ThingTypeUID("broadlink", "s1p");
     public static final ThingTypeUID THING_TYPE_MAGNET = new ThingTypeUID("broadlink", "s1m");
     public static final String CHANNEL_COMMAND = "command";
@@ -179,9 +179,8 @@ public class BroadlinkBindingConstants {
         SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.put(THING_TYPE_SP1, SP1);
         SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.put(THING_TYPE_SP2, SP2);
         SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.put(THING_TYPE_SP3, SP3);
-//        SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.put(THING_TYPE_S1C, S1C);
+        // SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.put(THING_TYPE_S1C, S1C);
         SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.put(THING_TYPE_PIR, S1P);
         SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.put(THING_TYPE_MAGNET, S1M);
     }
 }
-

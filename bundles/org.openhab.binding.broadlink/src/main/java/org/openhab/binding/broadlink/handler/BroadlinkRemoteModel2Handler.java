@@ -40,7 +40,7 @@ public class BroadlinkRemoteModel2Handler extends BroadlinkRemoteHandler {
             byte message[] = buildMessage((byte) 0x6a, payload);
             byte response[] = sendAndReceiveDatagram(message, "RM2 device status");
             byte decodedPayload[] = decodeDevicePacket(response);
-            float temperature = (float)((double)(decodedPayload[4] * 10 + decodedPayload[5]) / 10D);
+            float temperature = (float) ((double) (decodedPayload[4] * 10 + decodedPayload[5]) / 10D);
             updateState("temperature", new DecimalType(temperature));
             return true;
         } catch (Exception e) {

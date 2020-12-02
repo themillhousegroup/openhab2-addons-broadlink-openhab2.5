@@ -27,7 +27,8 @@ public class BroadlinkDeviceConfiguration {
     private int port;
     private String mac;
     private int pollingInterval;
-    @Nullable private String mapFilename;
+    @Nullable
+    private String mapFilename;
     private int retries = 1;
     private boolean ignoreFailedUpdates = false;
     private int deviceType;
@@ -106,7 +107,6 @@ public class BroadlinkDeviceConfiguration {
         this.deviceType = newDeviceType;
     }
 
-
     public void setRetries(int retries) {
         this.retries = retries;
     }
@@ -124,19 +124,9 @@ public class BroadlinkDeviceConfiguration {
     }
 
     public String toString() {
-        return (
-                new StringBuilder("BroadlinkDeviceConfiguration [ipAddress="))
-                .append(ipAddress)
-                .append(" (static: ")
-                .append(staticIp)
-                .append("), port=")
-                .append(port)
-                .append(", mac=")
-                .append(mac)
-                .append(", pollingInterval=")
-                .append(pollingInterval)
-                .append(", mapFilename=")
-                .append(mapFilename)
+        return (new StringBuilder("BroadlinkDeviceConfiguration [ipAddress=")).append(ipAddress).append(" (static: ")
+                .append(staticIp).append("), port=").append(port).append(", mac=").append(mac)
+                .append(", pollingInterval=").append(pollingInterval).append(", mapFilename=").append(mapFilename)
                 .append("]").toString();
     }
 }

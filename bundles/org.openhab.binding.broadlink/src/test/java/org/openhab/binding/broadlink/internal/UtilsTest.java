@@ -12,12 +12,11 @@
  */
 package org.openhab.binding.broadlink.internal;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.junit.Test;
 
 /**
  * Tests the generic utilty functions.
@@ -40,9 +39,7 @@ public class UtilsTest {
 
         byte[] result = Utils.padTo(source, 3);
         assertEquals(6, result.length);
-        byte[] expected = {
-                0x01, 0x02, 0x03, 0x04, 0x0, 0x0,
-        };
+        byte[] expected = { 0x01, 0x02, 0x03, 0x04, 0x0, 0x0, };
 
         assertArrayEquals(expected, result);
     }
@@ -53,14 +50,10 @@ public class UtilsTest {
 
         byte[] result = Utils.padTo(source, 8);
         assertEquals(8, result.length);
-        byte[] expected = {
-                0x01, 0x02, 0x03, 0x04,
-                0x0, 0x0, 0x0, 0x0,
-        };
+        byte[] expected = { 0x01, 0x02, 0x03, 0x04, 0x0, 0x0, 0x0, 0x0, };
 
         assertArrayEquals(expected, result);
     }
-
 
     @Test
     public void padToExtendsUndersizedBufferMultiple() {
@@ -68,14 +61,8 @@ public class UtilsTest {
 
         byte[] result = Utils.padTo(source, 16);
         assertEquals(16, result.length);
-        byte[] expected = {
-                0x01, 0x02, 0x03, 0x04,
-                0x0, 0x0, 0x0, 0x0,
-                0x0, 0x0, 0x0, 0x0,
-                0x0, 0x0, 0x0, 0x0,
-        };
+        byte[] expected = { 0x01, 0x02, 0x03, 0x04, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, };
 
         assertArrayEquals(expected, result);
     }
-
 }

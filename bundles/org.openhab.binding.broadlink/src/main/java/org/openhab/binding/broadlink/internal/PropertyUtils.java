@@ -12,9 +12,9 @@
  */
 package org.openhab.binding.broadlink.internal;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Utilities for working with properties.

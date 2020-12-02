@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Multiple power socket strip device
  *

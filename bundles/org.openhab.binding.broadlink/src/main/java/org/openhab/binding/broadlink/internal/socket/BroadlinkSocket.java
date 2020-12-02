@@ -12,12 +12,6 @@
  */
 package org.openhab.binding.broadlink.internal.socket;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.broadlink.internal.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -27,8 +21,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.broadlink.internal.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * Threaded socket implementation 
+ * Threaded socket implementation
  *
  * @author John Marshall/Cato Sognen - Initial contribution
  */
@@ -49,20 +49,17 @@ public class BroadlinkSocket {
         datagramPacket = new DatagramPacket(buffer, buffer.length);
     }
 
-    public static String decodeMAC(byte mac[])  {
+    public static String decodeMAC(byte mac[]) {
         if (mac.length < 6) {
             throw new RuntimeException("Insufficient MAC bytes provided, cannot decode it");
         }
 
         StringBuilder sb = new StringBuilder(18);
-        for(int i = 5; i >= 0; i--)
-        {
+        for (int i = 5; i >= 0; i--) {
             if (sb.length() > 0) {
                 sb.append(':');
             }
-            sb.append(String.format("%02x", new Object[] {
-                    Byte.valueOf(mac[i])
-            }));
+            sb.append(String.format("%02x", new Object[] { Byte.valueOf(mac[i]) }));
         }
 
         return sb.toString();
@@ -83,7 +80,10 @@ public class BroadlinkSocket {
                     byte remoteMAC[];
                     org.eclipse.smarthome.core.thing.ThingTypeUID deviceType;
                     int model;
-                    for (Iterator<BroadlinkSocketListener> iterator = (new ArrayList<BroadlinkSocketListener>(BroadlinkSocket.listeners)).iterator(); iterator.hasNext(); listener.onDataReceived(dgram.getAddress().getHostAddress(), dgram.getPort(), decodeMAC(remoteMAC), deviceType, model)) {
+                    for (Iterator<BroadlinkSocketListener> iterator = (new ArrayList<BroadlinkSocketListener>(
+                            BroadlinkSocket.listeners)).iterator(); iterator.hasNext(); listener.onDataReceived(
+                                    dgram.getAddress().getHostAddress(), dgram.getPort(), decodeMAC(remoteMAC),
+                                    deviceType, model)) {
                         listener = iterator.next();
                         byte receivedPacket[] = dgram.getData();
                         remoteMAC = Arrays.copyOfRange(receivedPacket, 58, 64);

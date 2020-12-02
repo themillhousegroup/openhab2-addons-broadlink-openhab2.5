@@ -12,15 +12,15 @@
  */
 package org.openhab.binding.broadlink.internal.discovery;
 
+import java.net.*;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.broadlink.internal.BroadlinkProtocol;
+import org.openhab.binding.broadlink.internal.NetworkUtils;
 import org.openhab.binding.broadlink.internal.socket.BroadlinkSocket;
 import org.openhab.binding.broadlink.internal.socket.BroadlinkSocketListener;
-import org.openhab.binding.broadlink.internal.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.*;
 
 /**
  * @author John Marshall - Initial contribution
@@ -36,7 +36,8 @@ public class DiscoveryProtocol {
         private final long timeoutMillis;
         private final DiscoveryFinishedListener finishedListener;
 
-        AsyncDiscoveryThread(BroadlinkSocketListener listener, long timeoutMillis, DiscoveryFinishedListener finishedListener) {
+        AsyncDiscoveryThread(BroadlinkSocketListener listener, long timeoutMillis,
+                DiscoveryFinishedListener finishedListener) {
             this.listener = listener;
             this.timeoutMillis = timeoutMillis;
             this.finishedListener = finishedListener;
@@ -52,9 +53,11 @@ public class DiscoveryProtocol {
         }
     }
 
-    public static void beginAsync(BroadlinkSocketListener listener, long discoveryTimeoutMillis, DiscoveryFinishedListener discoveryFinishedListener) {
+    public static void beginAsync(BroadlinkSocketListener listener, long discoveryTimeoutMillis,
+            DiscoveryFinishedListener discoveryFinishedListener) {
         LOGGER.warn("Beginning async Broadlink device scan; will wait {} ms for responses", discoveryTimeoutMillis);
-        AsyncDiscoveryThread adt = new AsyncDiscoveryThread(listener, discoveryTimeoutMillis, discoveryFinishedListener);
+        AsyncDiscoveryThread adt = new AsyncDiscoveryThread(listener, discoveryTimeoutMillis,
+                discoveryFinishedListener);
         adt.start();
     }
 

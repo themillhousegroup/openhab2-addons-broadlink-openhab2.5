@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.broadlink.internal.discovery;
 
+import java.util.*;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
@@ -21,13 +23,9 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.broadlink.BroadlinkBindingConstants;
 import org.openhab.binding.broadlink.internal.socket.BroadlinkSocketListener;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-
-// https://www.eclipse.org/smarthome/documentation/development/bindings/discovery-services.html
-import org.osgi.service.component.annotations.Component;
 
 /**
  * Broadlink discovery implementation.
@@ -53,7 +51,6 @@ public class BroadlinkDiscoveryService extends AbstractDiscoveryService
         DiscoveryProtocol.beginAsync(this, 10000L, this);
     }
 
-
     public void onDiscoveryFinished() {
         logger.info("Discovery complete. Found {} Broadlink devices", foundCount);
     }
@@ -63,16 +60,20 @@ public class BroadlinkDiscoveryService extends AbstractDiscoveryService
         removeOlderResults(getTimestampOfLastScan());
     }
 
-    public void onDataReceived(String remoteAddress, int remotePort, String remoteMAC, ThingTypeUID thingTypeUID, int model) {
-        logger.info("Data received during Broadlink device discovery: from {}:{} [{}]", remoteAddress, remotePort, remoteMAC);
+    public void onDataReceived(String remoteAddress, int remotePort, String remoteMAC, ThingTypeUID thingTypeUID,
+            int model) {
+        logger.info("Data received during Broadlink device discovery: from {}:{} [{}]", remoteAddress, remotePort,
+                remoteMAC);
         foundCount++;
         discoveryResultSubmission(remoteAddress, remotePort, remoteMAC, thingTypeUID, model);
     }
 
-    private void discoveryResultSubmission(String remoteAddress, int remotePort, String remoteMAC, ThingTypeUID thingTypeUID, int model) {
+    private void discoveryResultSubmission(String remoteAddress, int remotePort, String remoteMAC,
+            ThingTypeUID thingTypeUID, int model) {
         String modelAsHexString = String.format("%x", model);
         if (logger.isDebugEnabled()) {
-            logger.debug("Adding new Broadlink device ({} => {}) at {} with mac '{}' to Smarthome inbox", modelAsHexString, thingTypeUID, remoteAddress, remoteMAC);
+            logger.debug("Adding new Broadlink device ({} => {}) at {} with mac '{}' to Smarthome inbox",
+                    modelAsHexString, thingTypeUID, remoteAddress, remoteMAC);
         }
         Map<String, Object> properties = new HashMap<String, Object>(6);
         properties.put("ipAddress", remoteAddress);
@@ -91,15 +92,12 @@ public class BroadlinkDiscoveryService extends AbstractDiscoveryService
         }
     }
 
-    private void notifyThingDiscovered(ThingTypeUID thingTypeUID, ThingUID thingUID, String remoteAddress, Map<String, Object> properties) {
+    private void notifyThingDiscovered(ThingTypeUID thingTypeUID, ThingUID thingUID, String remoteAddress,
+            Map<String, Object> properties) {
         String deviceHumanName = BroadlinkBindingConstants.SUPPORTED_THING_TYPES_UIDS_TO_NAME_MAP.get(thingTypeUID);
         String label = deviceHumanName + " [" + remoteAddress + "]";
-        DiscoveryResult result = DiscoveryResultBuilder
-                .create(thingUID)
-                .withThingType(thingTypeUID)
-                .withProperties(properties)
-                .withLabel(label)
-                .build();
+        DiscoveryResult result = DiscoveryResultBuilder.create(thingUID).withThingType(thingTypeUID)
+                .withProperties(properties).withLabel(label).build();
 
         thingDiscovered(result);
     }

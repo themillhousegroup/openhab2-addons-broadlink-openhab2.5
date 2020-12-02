@@ -12,13 +12,13 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import java.io.IOException;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.Thing;
 
-import java.io.IOException;
-
 /**
- * Smart power socket handler 
+ * Smart power socket handler
  *
  * @author John Marshall/Cato Sognen - Initial contribution
  */

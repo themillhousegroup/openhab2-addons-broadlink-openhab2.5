@@ -14,15 +14,15 @@ package org.openhab.binding.broadlink.internal.discovery;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.broadlink.internal.socket.BroadlinkSocketListener;
 import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
+import org.openhab.binding.broadlink.internal.socket.BroadlinkSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This agent exploits the well-known Broadlink device discovery process
  * to attempt to "rediscover" a previously-discovered dynamically-addressed
- * Broadlink device that may have recently changed IP address. 
+ * Broadlink device that may have recently changed IP address.
  *
  * This agent has NOTHING TO DO WITH the initial device discovery process.
  * It is explicitly initiated when a dynamically-addressed Broadlink device
@@ -44,12 +44,15 @@ public class DeviceRediscoveryAgent implements BroadlinkSocketListener, Discover
     }
 
     public void attemptRediscovery() {
-        logger.warn("DeviceRediscoveryAgent - Beginning Broadlink device scan for missing {}", missingThingConfig.toString());
+        logger.warn("DeviceRediscoveryAgent - Beginning Broadlink device scan for missing {}",
+                missingThingConfig.toString());
         DiscoveryProtocol.beginAsync(this, 5000L, this);
     }
 
-    public void onDataReceived(String remoteAddress, int remotePort, String remoteMAC, ThingTypeUID thingTypeUID, int model) {
-        logger.trace("Data received during Broadlink device rediscovery: from {}:{} [{}]", remoteAddress, remotePort, remoteMAC);
+    public void onDataReceived(String remoteAddress, int remotePort, String remoteMAC, ThingTypeUID thingTypeUID,
+            int model) {
+        logger.trace("Data received during Broadlink device rediscovery: from {}:{} [{}]", remoteAddress, remotePort,
+                remoteMAC);
 
         // if this thing matches the missingThingConfig, we've found it!
         logger.trace("Comparing with desired mac: {}", missingThingConfig.getMACAsString());

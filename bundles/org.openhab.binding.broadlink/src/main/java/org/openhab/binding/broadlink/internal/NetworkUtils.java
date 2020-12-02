@@ -13,9 +13,9 @@
 package org.openhab.binding.broadlink.internal;
 
 import java.io.IOException;
-import java.util.concurrent.ThreadLocalRandom;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -66,12 +66,12 @@ public class NetworkUtils {
         return null;
     }
 
-    public static InetAddress getLocalHostLANAddress()
-            throws UnknownHostException {
+    public static InetAddress getLocalHostLANAddress() throws UnknownHostException {
         try {
             InetAddress candidateAddress = findNonLoopbackAddress();
 
-            if (candidateAddress != null) return candidateAddress;
+            if (candidateAddress != null)
+                return candidateAddress;
 
             InetAddress jdkSuppliedAddress = InetAddress.getLocalHost();
             if (jdkSuppliedAddress == null)
@@ -79,7 +79,8 @@ public class NetworkUtils {
             else
                 return jdkSuppliedAddress;
         } catch (Exception e) {
-            UnknownHostException unknownHostException = new UnknownHostException((new StringBuilder("Failed to determine LAN address: ")).append(e).toString());
+            UnknownHostException unknownHostException = new UnknownHostException(
+                    (new StringBuilder("Failed to determine LAN address: ")).append(e).toString());
             unknownHostException.initCause(e);
             throw unknownHostException;
         }
@@ -107,5 +108,4 @@ public class NetworkUtils {
         int randomNum = ThreadLocalRandom.current().nextInt((max - min) + 1) + min;
         return randomNum;
     }
-
 }

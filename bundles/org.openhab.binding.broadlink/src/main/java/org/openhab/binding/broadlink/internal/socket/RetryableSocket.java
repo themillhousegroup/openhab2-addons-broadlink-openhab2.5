@@ -12,13 +12,13 @@
  */
 package org.openhab.binding.broadlink.internal.socket;
 
+import java.io.IOException;
+import java.net.*;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.broadlink.config.BroadlinkDeviceConfiguration;
 import org.openhab.binding.broadlink.internal.ThingLogger;
-
-import java.io.IOException;
-import java.net.*;
 
 /**
  * @author John Marshall - Initial contribution
@@ -72,7 +72,8 @@ public class RetryableSocket {
 
     private boolean sendDatagram(byte message[], String purpose) {
         try {
-            thingLogger.logTrace("Sending " + purpose + " to " + thingConfig.getIpAddress() + ":" + thingConfig.getPort());
+            thingLogger
+                    .logTrace("Sending " + purpose + " to " + thingConfig.getIpAddress() + ":" + thingConfig.getPort());
             if (socket == null || socket.isClosed()) {
                 thingLogger.logTrace("No existing socket ... creating");
                 socket = new DatagramSocket();

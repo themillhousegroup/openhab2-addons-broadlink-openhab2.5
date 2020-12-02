@@ -12,14 +12,14 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.openhab.binding.broadlink.internal.Utils;
 import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 /**
  * Remote blaster handler, "generation" 4
@@ -52,9 +52,9 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
             // Temps and humidity get divided by 100 now, not 10
             // Temperature and Humidity response fields are 2 bytes further into the response,
             // mirroring the request
-            float temperature = (float)((double)(decodedPayload[6] * 100 + decodedPayload[7]) / 100D);
+            float temperature = (float) ((double) (decodedPayload[6] * 100 + decodedPayload[7]) / 100D);
             updateState("temperature", new DecimalType(temperature));
-            float humidity = (float)((double)(decodedPayload[8] * 100 + decodedPayload[8]) / 100D);
+            float humidity = (float) ((double) (decodedPayload[8] * 100 + decodedPayload[8]) / 100D);
             updateState("humidity", new DecimalType(humidity));
             return true;
         } catch (Exception e) {
@@ -68,7 +68,7 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
 
         try {
             // These devices use a 6-byte sendCode preamble instead of the previous 4
-            //https://github.com/mjg59/python-broadlink/blob/0.13.0/broadlink/__init__.py#L50 add RM4 list
+            // https://github.com/mjg59/python-broadlink/blob/0.13.0/broadlink/__init__.py#L50 add RM4 list
 
             byte[] preamble = new byte[6];
             preamble[0] = (byte) 0xd0;
@@ -82,7 +82,5 @@ public class BroadlinkRemoteModel4Handler extends BroadlinkRemoteHandler {
         } catch (IOException e) {
             thingLogger.logError("Exception while sending code", e);
         }
-
-
     }
 }

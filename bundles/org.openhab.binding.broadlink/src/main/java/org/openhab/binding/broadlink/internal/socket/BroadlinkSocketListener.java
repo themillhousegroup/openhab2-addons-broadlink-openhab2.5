@@ -16,12 +16,13 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
 /**
- * Interface for something that is interested in being informed when data arrives on a socket 
+ * Interface for something that is interested in being informed when data arrives on a socket
  *
  * @author John Marshall/Cato Sognen - Initial contribution
  */
 @NonNullByDefault
 public interface BroadlinkSocketListener {
 
-    public abstract void onDataReceived(String remoteAddress, int remotePort, String remoteMAC, ThingTypeUID thingTypeUID, int model);
+    public abstract void onDataReceived(String remoteAddress, int remotePort, String remoteMAC,
+            ThingTypeUID thingTypeUID, int model);
 }

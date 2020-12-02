@@ -12,13 +12,12 @@
  */
 package org.openhab.binding.broadlink.internal;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.openhab.binding.broadlink.BroadlinkBindingConstants;
-
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.junit.Assert;
+import org.junit.Test;
+import org.openhab.binding.broadlink.BroadlinkBindingConstants;
 
 /**
  * Tests that each Thing Type maps to the right model number.
@@ -29,63 +28,42 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public class ModelMapperTest {
     @Test
     public void mapsSpMini2ASp2() {
-        assertEquals(
-            BroadlinkBindingConstants.THING_TYPE_SP2,
-            ModelMapper.getThingType(0x7539)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_SP2, ModelMapper.getThingType(0x7539));
     }
+
     @Test
     public void mapsRmMini3AsRm3() {
-        assertEquals(
-            BroadlinkBindingConstants.THING_TYPE_RM3,
-            ModelMapper.getThingType(0x27c2)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_RM3, ModelMapper.getThingType(0x27c2));
     }
 
     @Test
     public void mapsRm35f36AsRm3Q() {
-        assertEquals(
-            BroadlinkBindingConstants.THING_TYPE_RM3Q,
-            ModelMapper.getThingType(0x5f36)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_RM3Q, ModelMapper.getThingType(0x5f36));
     }
 
     @Test
     public void mapsRm4bAsRm4() {
-        assertEquals(
-                BroadlinkBindingConstants.THING_TYPE_RM4,
-                ModelMapper.getThingType(0x51da)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_RM4, ModelMapper.getThingType(0x51da));
     }
+
     @Test
     public void mapsRm4ProAsRm4() {
-        assertEquals(
-                BroadlinkBindingConstants.THING_TYPE_RM4,
-                ModelMapper.getThingType(0x61a2)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_RM4, ModelMapper.getThingType(0x61a2));
     }
 
     @Test
     public void mapsRm462bcAsRm4() {
-        assertEquals(
-                BroadlinkBindingConstants.THING_TYPE_RM4,
-                ModelMapper.getThingType(0x62bc)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_RM4, ModelMapper.getThingType(0x62bc));
     }
 
     @Test
     public void mapsRm4Model6026AsRm4() {
-        assertEquals(
-                BroadlinkBindingConstants.THING_TYPE_RM4,
-                ModelMapper.getThingType(0x6026)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_RM4, ModelMapper.getThingType(0x6026));
     }
+
     @Test
     public void mapsRm4Model24846AsRm4() {
-        assertEquals(
-                BroadlinkBindingConstants.THING_TYPE_RM4,
-                ModelMapper.getThingType(24846)
-        );
+        assertEquals(BroadlinkBindingConstants.THING_TYPE_RM4, ModelMapper.getThingType(24846));
     }
 
     @Test
@@ -95,10 +73,8 @@ public class ModelMapperTest {
             Assert.fail("Should have thrown on unmapped device model");
         } catch (Exception e) {
             assertEquals(
-        "Device identifying itself as '26214' (hex 0x6666) is not currently supported. Please report this to the developer!",
-                e.getMessage()
-            );
+                    "Device identifying itself as '26214' (hex 0x6666) is not currently supported. Please report this to the developer!",
+                    e.getMessage());
         }
-
     }
 }

@@ -12,6 +12,13 @@
  */
 package org.openhab.binding.broadlink.internal;
 
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -20,15 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.*;
 import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests thing logger object.
@@ -51,8 +50,9 @@ public class ThingLoggerTest {
         when(mockLogger.isDebugEnabled()).thenReturn(true);
         when(mockLogger.isTraceEnabled()).thenReturn(true);
     }
+
     @Test
-    public void canDescribeStatusOnline()  {
+    public void canDescribeStatusOnline() {
         String result = thingLogger.describeStatus();
         assertEquals("^", result);
     }
@@ -74,24 +74,27 @@ public class ThingLoggerTest {
     @Test
     public void prependArgumentsNoArgs() {
         Object[] result = thingLogger.prependDescription();
-        assertArrayEquals(new Object[] { "td1:1234", "^"}, result);
+        assertArrayEquals(new Object[] { "td1:1234", "^" }, result);
     }
+
     @Test
     public void prependArgumentsOneArg() {
-        Object[] result = thingLogger.prependDescription( "a1");
+        Object[] result = thingLogger.prependDescription("a1");
         assertArrayEquals(new Object[] { "td1:1234", "^", "a1" }, result);
     }
 
     @Test
     public void prependArgumentsTwoArgs() {
-        Object[] result = thingLogger.prependDescription( "a1", "a2");
+        Object[] result = thingLogger.prependDescription("a1", "a2");
         assertArrayEquals(new Object[] { "td1:1234", "^", "a1", "a2" }, result);
     }
+
     @Test
     public void prependArgumentsThreeArgs() {
-        Object[] result = thingLogger.prependDescription( "a1", "a2", "a3");
+        Object[] result = thingLogger.prependDescription("a1", "a2", "a3");
         assertArrayEquals(new Object[] { "td1:1234", "^", "a1", "a2", "a3" }, result);
     }
+
     @Test
     public void logDebugDoesNothingIfDisabled() {
         when(mockLogger.isDebugEnabled()).thenReturn(false);
@@ -110,10 +113,7 @@ public class ThingLoggerTest {
         expected.add("td1:1234");
         expected.add("^");
         expected.add("message");
-        assertEquals(
-            expected,
-            argCaptor.getAllValues()
-        );
+        assertEquals(expected, argCaptor.getAllValues());
     }
 
     @Test
@@ -127,10 +127,7 @@ public class ThingLoggerTest {
         expected.add("td1:1234");
         expected.add("^");
         expected.add("error message");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
+        assertEquals(expected, argCaptor.getAllValues());
     }
 
     @Test
@@ -146,12 +143,8 @@ public class ThingLoggerTest {
         assertEquals("{}[{}]: {}", prefixes.get(0));
         assertEquals("Broadlink Exception: ", prefixes.get(1));
         assertEquals("error description", argCaptor.getValue());
-        assertEquals(
-                t,
-                throwableCaptor.getValue()
-        );
+        assertEquals(t, throwableCaptor.getValue());
     }
-
 
     @Test
     public void logWarnPrependsThingInfo() {
@@ -164,10 +157,7 @@ public class ThingLoggerTest {
         expected.add("td1:1234");
         expected.add("^");
         expected.add("message");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
+        assertEquals(expected, argCaptor.getAllValues());
     }
 
     @Test
@@ -181,10 +171,7 @@ public class ThingLoggerTest {
         expected.add("td1:1234");
         expected.add("^");
         expected.add("message");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
+        assertEquals(expected, argCaptor.getAllValues());
     }
 
     @Test
@@ -205,9 +192,6 @@ public class ThingLoggerTest {
         expected.add("td1:1234");
         expected.add("^");
         expected.add("message");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
+        assertEquals(expected, argCaptor.getAllValues());
     }
 }

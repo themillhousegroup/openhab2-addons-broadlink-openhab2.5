@@ -12,13 +12,13 @@
  */
 package org.openhab.binding.broadlink.internal;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.junit.Test;
 
 /**
  * Tests property utility functions.
@@ -88,5 +88,4 @@ public class PropertyUtilsTest {
         boolean result = PropertyUtils.hasProperty(properties, "foo");
         assertTrue(result);
     }
-
 }

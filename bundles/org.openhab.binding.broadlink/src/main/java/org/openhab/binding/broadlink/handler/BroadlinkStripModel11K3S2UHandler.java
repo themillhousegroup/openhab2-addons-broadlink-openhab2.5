@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import java.io.IOException;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -20,10 +22,8 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 /**
- * Multiple power socket plus USB strip device  - 3 AC outlets and 2 USB outlets
+ * Multiple power socket plus USB strip device - 3 AC outlets and 2 USB outlets
  *
  * @author John Marshall/Cato Sognen - Initial contribution
  */

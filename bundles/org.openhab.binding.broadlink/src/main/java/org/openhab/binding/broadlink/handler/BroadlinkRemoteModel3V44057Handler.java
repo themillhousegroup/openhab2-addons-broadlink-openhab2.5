@@ -26,7 +26,7 @@ public class BroadlinkRemoteModel3V44057Handler extends BroadlinkRemoteModel4Han
     public BroadlinkRemoteModel3V44057Handler(Thing thing) {
         super(thing);
     }
-    
+
     protected boolean getStatusFromDevice() {
         return true;
     }

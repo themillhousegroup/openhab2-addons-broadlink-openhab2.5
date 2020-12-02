@@ -12,6 +12,9 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
@@ -21,9 +24,6 @@ import org.mockito.Mockito;
 import org.openhab.binding.broadlink.BroadlinkBindingConstants;
 import org.openhab.binding.broadlink.internal.socket.NetworkTrafficObserver;
 import org.openhab.binding.broadlink.internal.socket.RetryableSocket;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Abstract thing handler test.
