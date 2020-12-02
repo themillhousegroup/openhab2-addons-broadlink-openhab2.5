@@ -24,8 +24,8 @@ import org.slf4j.Logger;
 @NonNullByDefault
 public final class ThingLogger  {
 
-    private static final String STANDARD_LOG_PREFIX_FORMAT = "{}[{}]: ";
     private static final String STANDARD_LOG_PREFIX_WITH_MSG_FORMAT = "{}[{}]: {}";
+    private static final String EXCEPTION_DUMP_PREFIX = "Broadlink Exception: ";
 
     private final Thing thing;
     private final Logger logger;
@@ -64,13 +64,9 @@ public final class ThingLogger  {
         return allArgs;
     }
 
-    public void logDebug(String msg, Object... args) {
+    public void logDebug(String msg) {
         if (logger.isDebugEnabled()) {
-            if (args.length == 0) {
-                logger.debug(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
-            } else {
-                logger.debug(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
-            }
+            logger.debug(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
         }
     }
 
@@ -80,37 +76,24 @@ public final class ThingLogger  {
      */
     public void logError(String msg, Throwable... t) {
         // BETA 8 - errors logged with their throwable to assist diagnosis
-        if (t.length == 0) {
-            logger.error(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
-        } else {
-            String message = describeThing() + "[" + describeStatus() + "]: " + msg;
-            logger.error(message, t[0]);
+        logger.error(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
+
+        if (t.length > 0) {
+            logger.error(EXCEPTION_DUMP_PREFIX, t[0]);
         }
     }
 
-    public void logWarn(String msg, Object... args) {
-        if (args.length == 0) {
-            logger.warn(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
-        } else {
-            logger.warn(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
-        }
+    public void logWarn(String msg) {
+        logger.warn(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
     }
 
-    public void logInfo(String msg, Object... args) {
-        if (args.length == 0) {
-            logger.info(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
-        } else {
-            logger.info(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
-        }
+    public void logInfo(String msg) {
+        logger.info(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
     }
 
-    public void logTrace(String msg, Object... args) {
+    public void logTrace(String msg) {
         if (logger.isTraceEnabled()) {
-            if (args.length == 0) {
-                logger.trace(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
-            } else {
-                logger.trace(STANDARD_LOG_PREFIX_FORMAT + msg, prependDescription(args));
-            }
+            logger.trace(STANDARD_LOG_PREFIX_WITH_MSG_FORMAT, appendMessage(prependDescription(), msg));
         }
     }
 }

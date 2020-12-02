@@ -89,8 +89,12 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
         switch ((s = channelTypeUID.getId()).hashCode()) {
         case 950394699: // FIXME WTF?!?!
             if (s.equals("command")) {
-                thingLogger.logDebug("Handling ir/rf command {} on channel {} of thing {}",
-                        new Object[] { command, channelUID.getId(), getThing().getLabel() });
+                thingLogger.logDebug(String.format(
+                    "Handling ir/rf command '%s' on channel %s of thing %s",
+                    command,
+                    channelUID.getId(),
+                    getThing().getLabel()
+                ));
                 byte code[] = lookupCode(command, channelUID);
                 if (code != null)
                     sendCode(code);
@@ -126,19 +130,29 @@ public class BroadlinkRemoteHandler extends BroadlinkBaseThingHandler {
             value = transformService.transform(mapFile, command.toString());
             code = HexUtils.hexToBytes(value);
         } catch (TransformationException e) {
-            thingLogger.logError(
-            "Failed to transform command '" + command + "' for thing " + getThing().getLabel() + " using map file '" + mapFile + "'",
+            thingLogger.logError(String.format(
+            "Failed to transform command '%s' for thing %s using map file '%s'",
+                command,
+                getThing().getLabel(),
+                mapFile),
             e);
             return null;
         }
         if (StringUtils.isEmpty(value)) {
-            thingLogger.logError(
-                "No entry for command '" + command + "' in map file '" + mapFile + "' for thing getThing().getLabel()"
-            );
+            thingLogger.logError(String.format(
+                "No entry for command '%s' in map file '%s' for thing %s",
+                command,
+                mapFile,
+                getThing().getLabel()
+            ));
             return null;
         }
-        thingLogger.logDebug("Transformed command '{}' for thing {} with map file '{}'",
-                new Object[] { command, getThing().getLabel(), mapFile });
+        thingLogger.logDebug(
+            String.format("Transformed command '%s' for thing %s with map file '%s'",
+            command,
+            getThing().getLabel(),
+            mapFile
+        ));
         return code;
     }
 

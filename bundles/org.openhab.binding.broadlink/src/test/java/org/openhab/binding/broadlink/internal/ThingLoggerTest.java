@@ -100,7 +100,7 @@ public class ThingLoggerTest {
     }
 
     @Test
-    public void logDebugPrependsThingInfoForZeroVarargs() {
+    public void logDebugPrependsThingInfo() {
         ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
         thingLogger.logDebug("message");
@@ -113,40 +113,6 @@ public class ThingLoggerTest {
         assertEquals(
             expected,
             argCaptor.getAllValues()
-        );
-    }
-
-    @Test
-    public void logDebugPrependsThingInfoForOneVararg() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logDebug("message with arg {}", "extra");
-        verify(mockLogger).debug(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with arg {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-    @Test
-    public void logDebugPrependsThingInfoForTwoVarargs() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logDebug("message with first {} second {}", "extra", "extra2");
-        verify(mockLogger).debug(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with first {} second {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        expected.add("extra2");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
         );
     }
 
@@ -168,13 +134,18 @@ public class ThingLoggerTest {
     }
 
     @Test
-    public void logErrorPrependsThingInfoBeforeThrowable() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
+    public void logErrorWritesThingInfoBeforeThrowableInTwoWrites() {
+        ArgumentCaptor<String> prefixCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
         ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
         Throwable t = new IllegalArgumentException("foo");
         thingLogger.logError("error description", t);
-        verify(mockLogger).error(stringCaptor.capture(), throwableCaptor.capture());
-        assertEquals("td1:1234[^]: error description", stringCaptor.getValue());
+        verify(mockLogger).error(prefixCaptor.capture(), argCaptor.capture());
+        verify(mockLogger).error(prefixCaptor.capture(), throwableCaptor.capture());
+        List<String> prefixes = prefixCaptor.getAllValues();
+        assertEquals("{}[{}]: {}", prefixes.get(0));
+        assertEquals("Broadlink Exception: ", prefixes.get(1));
+        assertEquals("error description", argCaptor.getValue());
         assertEquals(
                 t,
                 throwableCaptor.getValue()
@@ -183,7 +154,7 @@ public class ThingLoggerTest {
 
 
     @Test
-    public void logWarnPrependsThingInfoForZeroVarargs() {
+    public void logWarnPrependsThingInfo() {
         ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
         thingLogger.logWarn("message");
@@ -200,40 +171,7 @@ public class ThingLoggerTest {
     }
 
     @Test
-    public void logWarnPrependsThingInfoForOneVararg() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logWarn("message with arg {}", "extra");
-        verify(mockLogger).warn(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with arg {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-    @Test
-    public void logWarnPrependsThingInfoForTwoVarargs() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logWarn("message with first {} second {}", "extra", "extra2");
-        verify(mockLogger).warn(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with first {} second {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        expected.add("extra2");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-    @Test
-    public void logInfoPrependsThingInfoForZeroVarargs() {
+    public void logInfoPrependsThingInfo() {
         ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
         thingLogger.logInfo("message");
@@ -250,40 +188,6 @@ public class ThingLoggerTest {
     }
 
     @Test
-    public void logInfoPrependsThingInfoForOneVararg() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logInfo("message with arg {}", "extra");
-        verify(mockLogger).info(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with arg {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-    @Test
-    public void logInfoPrependsThingInfoForTwoVarargs() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logInfo("message with first {} second {}", "extra", "extra2");
-        verify(mockLogger).info(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with first {} second {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        expected.add("extra2");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-
-    @Test
     public void logTraceDoesNothingIfDisabled() {
         when(mockLogger.isTraceEnabled()).thenReturn(false);
         thingLogger.logTrace("message");
@@ -291,7 +195,7 @@ public class ThingLoggerTest {
     }
 
     @Test
-    public void logTracePrependsThingInfoForZeroVarargs() {
+    public void logTracePrependsThingInfo() {
         ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
         thingLogger.logTrace("message");
@@ -301,40 +205,6 @@ public class ThingLoggerTest {
         expected.add("td1:1234");
         expected.add("^");
         expected.add("message");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-
-    @Test
-    public void logTracePrependsThingInfoForOneVararg() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logTrace("message with arg {}", "extra");
-        verify(mockLogger).trace(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with arg {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        assertEquals(
-                expected,
-                argCaptor.getAllValues()
-        );
-    }
-    @Test
-    public void logTracePrependsThingInfoForTwoVarargs() {
-        ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Object[]> argCaptor = ArgumentCaptor.forClass(Object[].class);
-        thingLogger.logTrace("message with first {} second {}", "extra", "extra2");
-        verify(mockLogger).trace(stringCaptor.capture(), argCaptor.capture());
-        assertEquals("{}[{}]: message with first {} second {}", stringCaptor.getValue());
-        List<Object> expected = new ArrayList<Object>();
-        expected.add("td1:1234");
-        expected.add("^");
-        expected.add("extra");
-        expected.add("extra2");
         assertEquals(
                 expected,
                 argCaptor.getAllValues()

@@ -12,11 +12,13 @@
  */
 package org.openhab.binding.broadlink.handler;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerCallback;
 import org.eclipse.smarthome.core.thing.internal.ThingImpl;
-import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.openhab.binding.broadlink.BroadlinkBindingConstants;
 import org.openhab.binding.broadlink.internal.socket.NetworkTrafficObserver;
 import org.openhab.binding.broadlink.internal.socket.RetryableSocket;
 
@@ -28,20 +30,15 @@ import java.util.Map;
  * 
  * @author John Marshall/Cato Sognen - Initial contribution
  */
+@NonNullByDefault
 public abstract class AbstractBroadlinkThingHandlerTest {
 
-    protected Map<String, Object> properties;
-    protected Configuration config;
-    protected ThingImpl thing;
-
-    @Mock
-    protected RetryableSocket mockSocket;
-
-    @Mock
-    protected NetworkTrafficObserver trafficObserver;
-
-    @Mock
-    protected ThingHandlerCallback mockCallback;
+    protected Map<String, Object> properties = new HashMap<>();
+    protected Configuration config = new Configuration();
+    protected ThingImpl thing = new ThingImpl(BroadlinkBindingConstants.THING_TYPE_A1, "a1");
+    protected RetryableSocket mockSocket = Mockito.mock(RetryableSocket.class);
+    protected NetworkTrafficObserver trafficObserver = Mockito.mock(NetworkTrafficObserver.class);
+    protected ThingHandlerCallback mockCallback = Mockito.mock(ThingHandlerCallback.class);
 
     protected void configureUnderlyingThing(ThingTypeUID thingTypeUID, String thingId) {
         properties = new HashMap<>();

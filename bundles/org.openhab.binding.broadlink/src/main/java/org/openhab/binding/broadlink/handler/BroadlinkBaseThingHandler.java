@@ -71,11 +71,11 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         this.thingConfig = getConfigAs(BroadlinkDeviceConfiguration.class);
         count = (new Random()).nextInt(65535);
 
-        thingLogger.logInfo(
-            "constructed: resetting deviceKey to '{}', length {}",
+        thingLogger.logInfo(String.format(
+            "constructed: resetting deviceKey to '%s', length %d",
             BroadlinkBindingConstants.BROADLINK_AUTH_KEY,
             BroadlinkBindingConstants.BROADLINK_AUTH_KEY.length()
-        );
+        ));
         thingLogger.logInfo("(HINT: this should start '0976', end '8b02' and have length 32)");
         this.deviceId = HexUtils.hexToBytes(INITIAL_DEVICE_ID);
         this.deviceKey = HexUtils.hexToBytes(BroadlinkBindingConstants.BROADLINK_AUTH_KEY);
@@ -155,11 +155,11 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
             properties.put("id", HexUtils.bytesToHex(deviceId));
             properties.put("key", HexUtils.bytesToHex(deviceKey));
             updateProperties(properties);
-            thingLogger.logDebug(
-            "Authenticated with id '{}' and key '{}'",
+            thingLogger.logDebug(String.format(
+                "Authenticated with id '%s' and key '%s'",
                 HexUtils.bytesToHex(deviceId),
                 HexUtils.bytesToHex(deviceKey)
-            );
+            ));
             authenticated = true;
             return true;
         } catch (Exception e) {
@@ -178,11 +178,6 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     
     private byte[] buildMessage(byte command, byte payload[], int deviceType) throws IOException {
         count = count + 1 & 0xffff;
-        thingLogger.logTrace("building message with count: {}, deviceId: {}, deviceKey: {}",
-            count,
-            HexUtils.bytesToHex(deviceId),
-            HexUtils.bytesToHex(deviceKey)
-        );
 
         if (networkTrafficObserver != null) {
             networkTrafficObserver.onCommandSent(command);
@@ -236,9 +231,9 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     public void updateItemStatus() {
-        thingLogger.logTrace("updateItemStatus; checking host availability at {}", thingConfig.getIpAddress());
+        thingLogger.logTrace("updateItemStatus; checking host availability at " + thingConfig.getIpAddress());
         if (NetworkUtils.hostAvailabilityCheck(thingConfig.getIpAddress(), 3000)) {
-            thingLogger.logTrace("updateItemStatus; host found at {}", thingConfig.getIpAddress());
+            thingLogger.logTrace("updateItemStatus; host found at " + thingConfig.getIpAddress());
             if (!Utils.isOnline(getThing())) {
                 thingLogger.logTrace("updateItemStatus; device not currently online, resolving");
                 transitionToOnline();
@@ -257,11 +252,11 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
         } else {
             if (thingConfig.isStaticIp()) {
                 if (!Utils.isOffline(getThing())) {
-                    thingLogger.logDebug("Statically-IP-addressed device not found at {}", thingConfig.getIpAddress());
+                    thingLogger.logDebug("Statically-IP-addressed device not found at " + thingConfig.getIpAddress());
                     forceOffline(ThingStatusDetail.NONE,"Couldn't find statically-IP-addressed device");
                 }
             } else {
-                thingLogger.logDebug("Dynamic IP device not found at {}, will search...", thingConfig.getIpAddress());
+                thingLogger.logDebug(String.format("Dynamic IP device not found at %s, will search...", thingConfig.getIpAddress()));
                 DeviceRediscoveryAgent dra = new DeviceRediscoveryAgent(thingConfig, this);
                 dra.attemptRediscovery();
                 thingLogger.logDebug("Asynchronous dynamic IP device search initiated...");
@@ -270,7 +265,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     public void onDeviceRediscovered(String newIpAddress) {
-        thingLogger.logInfo("Rediscovered this device at IP {}", newIpAddress);
+        thingLogger.logInfo("Rediscovered this device at IP " + newIpAddress);
         thingConfig.setIpAddress(newIpAddress);
         transitionToOnline();
     }
@@ -303,7 +298,7 @@ public abstract class BroadlinkBaseThingHandler extends BaseThingHandler impleme
     }
 
     private void forceOffline(ThingStatusDetail detail, String reason) {
-        thingLogger.logWarn("Online -> Offline due to: {}", reason);
+        thingLogger.logWarn("Online -> Offline due to: " + reason);
         authenticated = false; // This session is dead; we'll need to re-authenticate next time
         updateStatus(
                 ThingStatus.OFFLINE,

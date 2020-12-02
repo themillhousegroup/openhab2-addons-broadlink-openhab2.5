@@ -74,6 +74,8 @@ public class ModelMapper {
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Mini
         if (model == 0x61a2)
             return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Pro
+        if (model == 0x649b)
+            return BroadlinkBindingConstants.THING_TYPE_RM4; // RM4 Pro
         if (model == 0x273d)
             return BroadlinkBindingConstants.THING_TYPE_RM; // RM Pro Phicomm
         if (model == 0x2783)

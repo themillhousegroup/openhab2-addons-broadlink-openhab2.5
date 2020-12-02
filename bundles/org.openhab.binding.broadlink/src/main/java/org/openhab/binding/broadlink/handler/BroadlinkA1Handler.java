@@ -46,7 +46,7 @@ public class BroadlinkA1Handler extends BroadlinkBaseThingHandler {
             }
             byte decryptResponse[] = decodeDevicePacket(response);
             float temperature = (float) ((double) (decryptResponse[4] * 10 + decryptResponse[5]) / 10D);
-            thingLogger.logTrace("A1 getStatusFromDevice got temperature {}", temperature);
+            thingLogger.logTrace("A1 getStatusFromDevice got temperature " + temperature);
 
             updateState("temperature", new DecimalType(temperature));
             updateState("humidity", new DecimalType((double) (decryptResponse[6] * 10 + decryptResponse[7]) / 10D));
