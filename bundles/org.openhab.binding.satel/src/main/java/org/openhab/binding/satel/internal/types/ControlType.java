@@ -14,11 +14,14 @@ package org.openhab.binding.satel.internal.types;
 
 import java.util.BitSet;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Interface for all types of control.
  *
  * @author Krzysztof Goworek - Initial contribution
  */
+@NonNullByDefault
 public interface ControlType {
 
     /**
@@ -41,5 +44,4 @@ public interface ControlType {
      * @return command identifier
      */
     BitSet getControlledStates();
-
 }

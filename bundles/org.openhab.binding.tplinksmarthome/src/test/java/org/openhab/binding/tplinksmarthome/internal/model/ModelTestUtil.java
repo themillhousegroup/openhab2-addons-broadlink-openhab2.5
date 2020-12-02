@@ -46,7 +46,6 @@ public final class ModelTestUtil {
      */
     public static <T> T jsonFromFile(String filename, Class<T> clazz) throws IOException {
         return GSON.fromJson(readJson(filename), clazz);
-
     }
 
     /**
@@ -63,5 +62,4 @@ public final class ModelTestUtil {
                 .toString(ModelTestUtil.class.getResourceAsStream(filename + ".json"), StandardCharsets.UTF_8.name())
                 .replaceAll("[\n\r\t ]", "");
     }
-
 }

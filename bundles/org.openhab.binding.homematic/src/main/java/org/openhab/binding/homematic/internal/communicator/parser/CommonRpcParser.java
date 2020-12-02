@@ -175,6 +175,12 @@ public abstract class CommonRpcParser<M, R> implements RpcParser<M, R> {
         HmValueType valueType = HmValueType.parse(type);
         if (valueType == null || valueType == HmValueType.UNKNOWN) {
             throw new IOException("Unknown datapoint type: " + type);
+        } else if (valueType == HmValueType.FLOAT && dp.getUnit() == null
+                && dp.getName().matches("\\w*_TEMPERATURE(_\\w.*|$)")) {
+            logger.debug("No unit information found for temperature datapoint {}, assuming Number:Temperature",
+                    dp.getName());
+            dp.setUnit("°C"); // Bypass for a problem with HMIP devices where unit of temperature channels is sometimes
+                              // empty
         }
         dp.setType(valueType);
 
@@ -219,5 +225,4 @@ public abstract class CommonRpcParser<M, R> implements RpcParser<M, R> {
             return value;
         }
     }
-
 }

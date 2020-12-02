@@ -12,6 +12,7 @@
  */
 package org.openhab.binding.lutron.internal.handler;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.Thing;
 
 /**
@@ -19,12 +20,11 @@ import org.eclipse.smarthome.core.thing.Thing;
  *
  * @author Bob Adair - Initial contribution
  */
-
+@NonNullByDefault
 public class MaintainedCcoHandler extends CcoHandler {
 
     public MaintainedCcoHandler(Thing thing) {
         super(thing);
         this.outputType = CcoOutputType.MAINTAINED;
     }
-
 }

@@ -12,7 +12,9 @@
  */
 package org.openhab.binding.synopanalyser.internal.synop;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * The {@link SynopMobile} is responsible for analyzing Mobile station
@@ -20,9 +22,10 @@ import java.util.ArrayList;
  *
  * @author Jonarzz - Initial contribution
  */
+@NonNullByDefault
 public class SynopShip extends SynopMobile {
 
-    public SynopShip(ArrayList<String> stringArray) {
+    public SynopShip(List<String> stringArray) {
         super(stringArray);
     }
 

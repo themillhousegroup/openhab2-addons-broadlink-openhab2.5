@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.library.types.QuantityType;
-import org.eclipse.smarthome.core.library.unit.SmartHomeUnits;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.junit.Test;
@@ -84,5 +83,4 @@ public class EnergySwitchDeviceTest {
         assertSame("Unknown channel should return UNDEF", UnDefType.UNDEF,
                 device.updateChannel(CHANNEL_UID_OTHER, deviceState));
     }
-
 }
